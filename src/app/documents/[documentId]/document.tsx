@@ -6,6 +6,7 @@ import { Navbar } from "./navbar";
 import { Room } from "./room";
 import { Toolbar } from "./toolbar";
 import { api } from "../../../../convex/_generated/api";
+import AiChatPopup from "./ai-chat-popup";
 
 interface DocumentProps {
     preloadedDocument: Preloaded<typeof api.documents.getById>
@@ -20,6 +21,8 @@ export const Document = ({ preloadedDocument }: DocumentProps) => {
                 <div className="flex flex-col px-4 pt-2 gap-y-2 fixed top-0 left-0 right-0 z-10 bg-[#FAFBFD] print:hidden">
                     <Navbar data={document} />
                     <Toolbar />
+
+                    <AiChatPopup />
                 </div>
 
                 <div className="pt-[114px] print:top-0">

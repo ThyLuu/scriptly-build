@@ -1,23 +1,25 @@
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { Document } from "./document";
-import { auth } from '@clerk/nextjs/server'
+import { auth } from "@clerk/nextjs/server";
 import { preloadQuery } from "convex/nextjs";
 
 interface DocumentIdPageProps {
-    params: Promise<{ documentId: Id<'documents'> }>
+    params: Promise<{ documentId: Id<"documents"> }>
 }
 
 const DocumentIdPage = async ({ params }: DocumentIdPageProps) => {
     const { documentId } = await params
 
+    // Lấy token server-side cho preloadQuery (SSR)
     const { getToken } = await auth()
-    const token = await getToken({ template: 'convex' }) ?? undefined
+    const token = (await getToken({ template: "convex" })) ?? undefined
 
     if (!token) {
-        throw new Error('Không được cấp phép')
+        throw new Error("Không được cấp phép")
     }
 
+    // Preload dữ liệu trước khi render (SSR)
     const preloadedDocument = await preloadQuery(
         api.documents.getById,
         { id: documentId },
@@ -25,8 +27,10 @@ const DocumentIdPage = async ({ params }: DocumentIdPageProps) => {
     )
 
     if (!preloadedDocument) {
-        throw new Error('Không tìm thấy tài liệu')
+        throw new Error("Không tìm thấy tài liệu")
     }
+
+    console.log("Convex token (server):", token)
 
     return <Document preloadedDocument={preloadedDocument} />
 }

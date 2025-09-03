@@ -11,24 +11,36 @@ const liveblocks = new Liveblocks({
 export async function POST(req: Request) {
     const { sessionClaims } = await auth()
 
+    // if (!sessionClaims) {
+    //     return new Response('Không được cấp phép', { status: 401 })
+    // }
+
     if (!sessionClaims) {
-        return new Response('Không được cấp phép', { status: 401 })
+        return Response.json({ error: "Không được cấp phép" }, { status: 401 });
     }
 
     const user = await currentUser()
 
-    // console.log({sessionClaims})
+    console.log("Session Claims:", sessionClaims)
+
+    // if (!user) {
+    //     return new Response('Không được cấp phép', { status: 401 })
+    // }
 
     if (!user) {
-        return new Response('Không được cấp phép', { status: 401 })
+        return Response.json({ error: "Không được cấp phép" }, { status: 401 });
     }
 
     const { room } = await req.json()
 
     const document = await convex.query(api.documents.getById, { id: room })
 
+    // if (!document) {
+    //     return new Response('Không được cấp phép', { status: 401 })
+    // }
+
     if (!document) {
-        return new Response('Không được cấp phép', { status: 401 })
+        return Response.json({ error: "Không được cấp phép" }, { status: 401 });
     }
 
     const orgId = (sessionClaims as any).o?.id
@@ -39,8 +51,12 @@ export async function POST(req: Request) {
 
     // console.log({isOwner, isOrganizationMember})
 
+    // if (!isOwner && !isOrganizationMember) {
+    //     return new Response('Không được cấp phép', { status: 401 })
+    // }
+
     if (!isOwner && !isOrganizationMember) {
-        return new Response('Không được cấp phép', { status: 401 })
+        return Response.json({ error: "Không được cấp phép" }, { status: 401 });
     }
 
     const name = user.fullName ?? user.primaryEmailAddress?.emailAddress ?? 'Ẩn danh'
@@ -60,5 +76,17 @@ export async function POST(req: Request) {
 
     const { body, status } = await session.authorize()
 
-    return new Response(body, { status })
+    console.log("document", document)
+    console.log("orgId from claims", orgId)
+
+    const role = (sessionClaims as any).o?.rol
+    console.log("role", role)
+
+    // return new Response(body, { status })
+    return new Response(body, {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
 }

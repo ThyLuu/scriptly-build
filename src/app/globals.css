@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -42,6 +38,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -82,12 +79,14 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 .tiptap {
+
   /* Link styles */
   a {
     @apply text-blue-600;
@@ -95,6 +94,157 @@ body {
 
     &:hover {
       @apply underline underline-offset-4;
+    }
+  }
+
+  /* Mathematics extension styles */
+  .tiptap-mathematics-render {
+    padding: 0 0.25rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s ease;
+
+    &[data-type='inline-math'] {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    &[data-type='block-math'] {
+      display: block;
+      margin: 1rem 0;
+      padding: 1rem;
+      text-align: center;
+      background: #f9fafb;
+      /* nhẹ nhàng để phân biệt */
+      border: 1px dashed #d1d5db;
+      /* xám nhạt */
+    }
+
+    &--editable {
+      cursor: pointer;
+
+      &:hover {
+        background: #f3f4f6;
+        /* hover xám nhạt */
+      }
+    }
+
+    /* Lỗi khi parse LaTeX */
+    &.inline-math-error,
+    &.block-math-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #f87171;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+    }
+  }
+
+  /* Youtube embed UI */
+  div[data-youtube-video] {
+    position: relative;
+    cursor: move;
+    padding-right: 1.5rem;
+    margin: 1rem 0;
+
+    iframe {
+      display: block;
+      width: 100%;
+      min-width: 200px;
+      min-height: 200px;
+      border: 0.5rem solid #111;
+      /* viền đen để nổi bật */
+      border-radius: 0.5rem;
+      background: #000;
+      outline: 0px solid transparent;
+      transition: outline 0.15s ease;
+    }
+
+    /* Khi node được chọn */
+    &.ProseMirror-selectednode iframe {
+      outline: 3px solid #8b5cf6;
+      /* tím */
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid #d1d5db;
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+    color: #374151;
+    font-style: italic;
+    /* background-color: #f9fafb; */
+  }
+
+  pre {
+    background: #1e1e1e;
+    border-radius: 0.5rem;
+    color: #d4d4d4;
+    font-family: 'JetBrainsMono', monospace;
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      color: inherit;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding: 0;
+      display: block;
+      white-space: pre;
+    }
+
+    /* Code styling */
+    .hljs-comment,
+    .hljs-quote {
+      color: #616161;
+    }
+
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-attribute,
+    .hljs-tag,
+    .hljs-regexp,
+    .hljs-link,
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class {
+      color: #f98181;
+    }
+
+    .hljs-number,
+    .hljs-meta,
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-literal,
+    .hljs-type,
+    .hljs-params {
+      color: #fbbc88;
+    }
+
+    .hljs-string,
+    .hljs-symbol,
+    .hljs-bullet {
+      color: #b9f18d;
+    }
+
+    .hljs-title,
+    .hljs-section {
+      color: #faf594;
+    }
+
+    .hljs-keyword,
+    .hljs-selector-tag {
+      color: #70cff8;
+    }
+
+    .hljs-emphasis {
+      font-style: italic;
+    }
+
+    .hljs-strong {
+      font-weight: 700;
     }
   }
 
@@ -127,7 +277,7 @@ body {
       position: relative;
       vertical-align: top;
 
-      > * {
+      >* {
         margin-bottom: 0;
       }
     }
@@ -242,13 +392,13 @@ body {
       align-items: flex-start;
       display: flex;
 
-      > label {
+      >label {
         flex: 0 0 auto;
         margin-right: 0.5rem;
         user-select: none;
       }
 
-      > div {
+      >div {
         flex: 1 1 auto;
       }
     }
@@ -290,5 +440,5 @@ body {
 }
 
 div[data-radix-popper-content-wrapper] {
-  z-index: 50!important
+  z-index: 50 !important
 }

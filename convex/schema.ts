@@ -15,4 +15,25 @@ export default defineSchema({
             searchField: 'title',
             filterFields: ['ownerId', 'organizationId'],
         }),
-});
+
+    users: defineTable({
+        userId: v.string(),
+        email: v.string(),
+        name: v.optional(v.string()),
+        imageUrl: v.optional(v.string()),
+    })
+        .index('by_user_id', ['userId']),
+
+    chats: defineTable({
+        ownerId: v.string(),
+        title: v.optional(v.string()),
+        lastMessageAt: v.optional(v.number()),
+    }).index("by_owner_id", ["ownerId"]),
+
+    messages: defineTable({
+        chatId: v.id("chats"), 
+        senderId: v.string(), 
+        role: v.union(v.literal("user"), v.literal("ai")), 
+        content: v.string(), 
+    }).index("by_chat_id", ["chatId"]),
+})

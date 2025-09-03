@@ -7,6 +7,7 @@ import { ClerkProvider, useAuth, SignIn } from '@clerk/nextjs'
 import { FullscreenLoader } from "./fullscreen-loader";
 import { viVN } from '@clerk/localizations'
 import { LandingPage } from "./landing-page";
+import { useSyncUser } from "@/hooks/use-sync-user";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -15,7 +16,8 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
         <ClerkProvider localization={viVN as any} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>
             <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
                 <Authenticated>
-                    {children}
+                    {/* {children} */}
+                    <SyncUserWrapper>{children}</SyncUserWrapper>
                 </Authenticated>
 
                 <Unauthenticated>
@@ -35,4 +37,9 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
         </ClerkProvider>
 
     )
+}
+
+function SyncUserWrapper({ children }: { children: ReactNode }) {
+    useSyncUser();
+    return <>{children}</>;
 }

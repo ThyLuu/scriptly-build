@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import {
@@ -51,6 +51,11 @@ export function Room({ children }: { children: ReactNode }) {
 
                 const reponse = await fetch(endpoint, {
                     method: 'POST',
+                    // mới thêm vào
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
                     body: JSON.stringify({ room })
                 })
 
@@ -68,7 +73,7 @@ export function Room({ children }: { children: ReactNode }) {
 
                 return filteredUser.map((user) => user.id)
             }}
-            resolveRoomsInfo={async ({roomIds}) => {
+            resolveRoomsInfo={async ({ roomIds }) => {
                 const documents = await getDocuments(roomIds as Id<'documents'>[])
 
                 return documents.map((document) => ({
@@ -77,7 +82,7 @@ export function Room({ children }: { children: ReactNode }) {
                 }))
             }}
         >
-            <RoomProvider id={params.documentId as string} initialStorage={{leftMargin: LEFT_MARGIN_DEFAULT, rightMargin: RIGHT_MARGIN_DEFAULT}}>
+            <RoomProvider id={params.documentId as string} initialStorage={{ leftMargin: LEFT_MARGIN_DEFAULT, rightMargin: RIGHT_MARGIN_DEFAULT }}>
                 <ClientSideSuspense fallback={<FullscreenLoader label="Đang tải tài liệu ..." />}>
                     {children}
                 </ClientSideSuspense>

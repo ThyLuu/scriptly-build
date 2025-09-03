@@ -17,6 +17,8 @@ export async function getUsers() {
 
     // console.log({ sessionClaims })
 
+    if (!sessionClaims) return []
+
     const orgId = (sessionClaims as any).o?.id
 
     if (!orgId) {

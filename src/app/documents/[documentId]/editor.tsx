@@ -8,7 +8,7 @@ import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
-import Image from "@tiptap/extension-image";
+// import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
 import { useEditorStore } from '@/store/use-editor-store'
 import Underline from '@tiptap/extension-underline'
@@ -25,6 +25,25 @@ import { useLiveblocksExtension } from "@liveblocks/react-tiptap";
 import { Threads } from './threads'
 import { useStorage } from '@liveblocks/react'
 import { LEFT_MARGIN_DEFAULT, RIGHT_MARGIN_DEFAULT } from '@/constants/margins'
+// import CodeBlock from '@tiptap/extension-code-block'
+// import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { all, createLowlight } from 'lowlight'
+import javascript from 'highlight.js/lib/languages/javascript'
+import typescript from 'highlight.js/lib/languages/typescript'
+import html from 'highlight.js/lib/languages/xml'
+import css from 'highlight.js/lib/languages/css'
+// import Blockquote from '@tiptap/extension-blockquote'
+import Youtube from '@tiptap/extension-youtube'
+import Math from '@tiptap/extension-mathematics'
+import 'katex/dist/katex.min.css'
+// import { Dropcursor } from '@tiptap/extensions'
+
+const lowlight = createLowlight(all)
+
+lowlight.register('html', html)
+lowlight.register('css', css)
+lowlight.register('js', javascript)
+lowlight.register('ts', typescript)
 
 interface EditorProps {
     initialContent?: string | undefined
@@ -74,6 +93,20 @@ export const Editor = ({ initialContent }: EditorProps) => {
         },
         extensions: [
             liveblocks,
+            // Dropcursor.configure({
+            //     color: '#3B82F6',
+            //     width: 2
+            // }),
+            Math.configure({
+                katexOptions: {
+                    throwOnError: false
+                }
+            }),
+            Youtube,
+            // Blockquote,
+            // CodeBlockLowlight.configure({
+            //     lowlight
+            // }),
             StarterKit.configure({
                 history: false,
             }),
@@ -97,7 +130,7 @@ export const Editor = ({ initialContent }: EditorProps) => {
             TextStyle,
             FontFamily,
             Underline,
-            Image,
+            // Image,
             ImageResize,
             Table,
             TableCell,

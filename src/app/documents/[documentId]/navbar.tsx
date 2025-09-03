@@ -4,7 +4,7 @@ import Link from "next/link"
 import { DocumentInput } from "./document-input"
 import { IoDocumentText } from "react-icons/io5";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from "@/components/ui/menubar";
-import { BoldIcon, FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIcon, GlobeIcon, ItalicIcon, PrinterIcon, Redo2Icon, RemoveFormattingIcon, StrikethroughIcon, TextIcon, TrashIcon, UnderlineIcon, Undo2Icon } from "lucide-react";
+import { BoldIcon, FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIcon, GlobeIcon, ItalicIcon, PrinterIcon, Redo2Icon, RemoveFormattingIcon, Share2Icon, StrikethroughIcon, TextIcon, TrashIcon, UnderlineIcon, Undo2Icon } from "lucide-react";
 import { BsFilePdf } from "react-icons/bs";
 import { useEditorStore } from "@/store/use-editor-store";
 import { TablePicker } from "./tablePicker";
@@ -204,7 +204,7 @@ export const Navbar = ({ data }: NavbarProps) => {
                                                 4 x 4
                                             </MenubarItem>
                                             <MenubarItem onClick={() => insertTable({ rows: 5, cols: 5 })}>
-                                                4 x 4
+                                                5 x 5
                                             </MenubarItem>
                                         </MenubarSubContent>
                                     </MenubarSub>
@@ -297,6 +297,7 @@ export const Navbar = ({ data }: NavbarProps) => {
             <div className="flex gap-3 items-center pl-6">
                 <Avatars />
                 <Inbox />
+
                 <OrganizationSwitcher
                     afterCreateOrganizationUrl={'/'}
                     afterLeaveOrganizationUrl="/"

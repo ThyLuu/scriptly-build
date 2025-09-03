@@ -25,7 +25,7 @@ export function LandingPage() {
                 </p>
 
                 <SignInButton mode="modal">
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
+                    <button className="px-6 py-2 font-semibold bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
                         Bắt đầu
                     </button>
                 </SignInButton>
@@ -61,7 +61,7 @@ export function LandingPage() {
             {/* Footer */}
             <footer className="mt-5 flex justify-between items-center px-8 py-4 border-t text-gray-600 text-sm">
                 <div>Scriptly</div>
-                <div>Lưu Thy Thy</div>
+                <div>Lưu Thy Thy - 1050080078</div>
             </footer>
         </div>
     )

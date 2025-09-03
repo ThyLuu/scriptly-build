@@ -4,13 +4,362 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
-import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ChevronDownIcon, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, MinusIcon, PlusIcon, PrinterIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon } from "lucide-react";
+import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, Brush, ChevronDownIcon, Code, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, Mic, MinusIcon, PlusIcon, PrinterIcon, QuoteIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, Sigma, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon, WandSparkles, YoutubeIcon } from "lucide-react";
 import { type Level } from '@tiptap/extension-heading'
 import { type ColorResult, SketchPicker } from 'react-color'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Rnd } from 'react-rnd'
+import { Tldraw, useEditor } from "tldraw";
+import 'tldraw/tldraw.css'
+
+// interface AIGenerateProps {
+//     open: boolean;
+//     onOpenChange: (open: boolean) => void;
+// }
+
+// interface AIGenerateProps {
+//     open: boolean;
+//     onOpenChange: (open: boolean) => void;
+// }
+
+// export const AIGenerate = ({ open, onOpenChange }: AIGenerateProps) => {
+//     const [aiPrompt, setAiPrompt] = useState("");
+//     const [aiResult, setAiResult] = useState<string | null>(null);
+//     const [loading, setLoading] = useState(false);
+
+//     const handleAIGenerate = async () => {
+//         if (!aiPrompt.trim()) return;
+
+//         setLoading(true);
+//         setAiResult(null);
+
+//         try {
+//             // fetch với absolute URL
+//             const res = await fetch(new URL("/api/ai-generate", window.location.origin).toString(), {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify({ prompt: aiPrompt, chatId: "demo", senderId: "user" }),
+//             });
+
+//             // nếu server trả lỗi
+//             if (!res.ok) {
+//                 const text = await res.text();
+//                 console.error("Server trả lỗi:", text);
+//                 setAiResult("Có lỗi xảy ra khi tạo nội dung.");
+//                 return;
+//             }
+
+//             // parse JSON
+//             const data = await res.json();
+//             const answer: string = data.answer ?? "Không có nội dung nào được tạo.";
+//             console.log("AI answer:", answer);
+
+//             // chèn vào editor
+//             const { editor } = useEditorStore.getState();
+//             if (editor) {
+//                 const paragraphs = answer
+//                     .split("\n")
+//                     .map((p) => `<p>${p}</p>`)
+//                     .join("");
+//                 editor.commands.insertContent(paragraphs);
+//                 editor.commands.focus();
+//             }
+
+//             setAiResult(answer);
+//         } catch (err) {
+//             console.error("Lỗi khi gọi AI:", err);
+//             setAiResult("Có lỗi xảy ra khi tạo nội dung.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     return (
+//         <Dialog open={open} onOpenChange={onOpenChange}>
+//             <DialogContent className="sm:max-w-[500px]">
+//                 <DialogHeader>
+//                     <DialogTitle>AI tạo nội dung</DialogTitle>
+//                 </DialogHeader>
+
+//                 <Input
+//                     placeholder="Nhập yêu cầu tạo nội dung..."
+//                     value={aiPrompt}
+//                     onChange={(e) => setAiPrompt(e.target.value)}
+//                     className="mb-2"
+//                 />
+
+//                 <div className="flex justify-end gap-2 mb-2">
+//                     <Button variant="outline" onClick={() => onOpenChange(false)}>
+//                         Hủy
+//                     </Button>
+//                     <Button
+//                         className="bg-blue-500 hover:bg-blue-600"
+//                         onClick={handleAIGenerate}
+//                         disabled={loading}
+//                     >
+//                         {loading ? "Đang tạo..." : "Tạo"}
+//                     </Button>
+//                 </div>
+
+//                 {aiResult && (
+//                     <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">
+//                         {aiResult}
+//                     </div>
+//                 )}
+//             </DialogContent>
+//         </Dialog>
+//     );
+// };
+
+interface DrawingWindowProps {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (dataUrl: string) => void;
+}
+
+function Helper() {
+    const editor = useEditor();
+
+    useEffect(() => {
+        const container = editor.getContainer();
+        const focusOnPointerDown = () => editor.focus();
+        container.addEventListener('pointerdown', focusOnPointerDown);
+        return () => {
+            container.removeEventListener('pointerdown', focusOnPointerDown);
+        };
+    }, [editor]);
+
+    return null;
+}
+
+const DrawingWindow = ({ open, onClose, onSubmit }: DrawingWindowProps) => {
+    const [editor, setEditor] = useState<any>(null);
+
+    if (!open) return null;
+
+    const handleSave = async () => {
+        if (!editor) return;
+
+        const ids = Array.from(editor.getCurrentPageShapeIds());
+        if (ids.length === 0) {
+            alert("Không có gì để xuất!");
+            return;
+        }
+
+        const svg = await editor.getSvg(ids);
+        if (!svg) return;
+
+        const dataUrl = `data:image/svg+xml;base64,${btoa(
+            new XMLSerializer().serializeToString(svg)
+        )}`;
+
+        onSubmit(dataUrl);
+        onClose();
+    }
+
+    return (
+        <Rnd
+            default={{ x: 100, y: 0, width: 1000, height: 600 }}
+            minWidth={400}
+            minHeight={300}
+            bounds="window"
+            dragHandleClassName="drawing-header"
+            className="shadow-lg border absolute border-gray-300 bg-white rounded-lg z-50 flex flex-col overflow-visible"
+        >
+            <div className="flex flex-col h-full w-full">
+                <div className="drawing-header flex items-center justify-between bg-gray-100 px-3 py-2 cursor-move border-b relative z-10">
+                    <span className="font-medium">🎨 Bảng vẽ</span>
+                    <div className="space-x-2">
+                        <Button size="sm" variant="outline" onClick={onClose}>
+                            Đóng
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="bg-blue-500 hover:bg-blue-700 text-white"
+                            onClick={handleSave}
+                        >
+                            Chèn
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="flex-grow relative">
+                    <div className="h-full w-full pointer-events-none">
+                        <Tldraw
+                            persistenceKey="disable-pages"
+                            options={{ maxPages: 1 }}
+                            onMount={(editorInstance) => setEditor(editorInstance)}
+                            className="pointer-events-auto"
+                        />
+                    </div>
+                </div>
+
+            </div>
+        </Rnd>
+    );
+}
+
+function startVoiceToText() {
+    // @ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+        alert("Trình duyệt của bạn không hỗ trợ Speech Recognition.")
+        return
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'vi-VN'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+
+    recognition.start();
+
+    recognition.onstart = () => {
+        console.log("Đang nghe giọng nói...")
+    };
+
+    // Dùng any thay vì SpeechRecognitionEvent
+    recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript
+        console.log("Kết quả chuyển đổi:", transcript)
+
+        // Chèn vào editor
+        const { editor } = useEditorStore.getState();
+        editor?.chain().focus().insertContent(transcript).run()
+    }
+
+    recognition.onerror = (event: any) => {
+        if (event.error === "not-allowed") {
+            return;
+        }
+
+        if (event.error === "no-speech") {
+            return;
+        }
+    }
+
+    recognition.onend = () => {
+        console.log("Kết thúc thu âm.")
+    }
+}
+
+interface MathModalProps {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    onSubmit: (formula: string, displayMode: boolean) => void
+}
+
+const MathModal = ({ open, onOpenChange, onSubmit }: MathModalProps) => {
+    const [formula, setFormula] = useState("")
+    const [displayMode, setDisplayMode] = useState(false) // false = inline, true = block
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Chèn công thức toán học</DialogTitle>
+                </DialogHeader>
+
+                <textarea
+                    className="w-full border rounded p-2 font-mono text-sm"
+                    placeholder="Nhập công thức LaTeX, ví dụ: \frac{a}{b}"
+                    value={formula}
+                    onChange={(e) => setFormula(e.target.value)}
+                />
+
+                <div className="flex items-center gap-2 mt-2">
+                    <input
+                        type="checkbox"
+                        id="displayMode"
+                        checked={displayMode}
+                        onChange={(e) => setDisplayMode(e.target.checked)}
+                    />
+                    <label htmlFor="displayMode">Dạng block</label>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Hủy</Button>
+                    <Button
+                        className="bg-blue-500 hover:bg-blue-600"
+                        onClick={() => {
+                            onSubmit(formula, displayMode)
+                            onOpenChange(false)
+                        }}
+                    >
+                        Thêm
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+interface YoutubeModalProps {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    onSubmit: (url: string, width: number, height: number) => void
+}
+
+const YoutubeModal = ({ open, onOpenChange, onSubmit }: YoutubeModalProps) => {
+    const [url, setUrl] = useState("")
+    const [width, setWidth] = useState(640)
+    const [height, setHeight] = useState(480)
+    const [align, setAlign] = useState<"left" | "center" | "right">("center")
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Thêm YouTube video</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-3">
+                    <input
+                        type="text"
+                        placeholder="YouTube URL"
+                        className="w-full border px-3 py-2 rounded"
+                        value={url}
+                        onChange={e => setUrl(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                        <input
+                            type="number"
+                            className="w-1/2 border px-3 py-2 rounded"
+                            placeholder="Width"
+                            value={width}
+                            onChange={e => setWidth(Number(e.target.value))}
+                        />
+                        <input
+                            type="number"
+                            className="w-1/2 border px-3 py-2 rounded"
+                            placeholder="Height"
+                            value={height}
+                            onChange={e => setHeight(Number(e.target.value))}
+                        />
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            onSubmit(url, width, height)
+                            onOpenChange(false)
+                        }}
+                        className="bg-blue-500 hover:bg-blue-600"
+                    >
+                        Thêm
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 const LineHeightButton = () => {
     const { editor } = useEditorStore()
@@ -513,7 +862,6 @@ interface ToolbarButtonProps {
 
 const ToolbarButton = ({ onClick, isActive, icon: Icon }: ToolbarButtonProps) => {
     return (
-        
         <button
             onClick={onClick}
             className={cn('text-sm h-7 min-w-7 flex items-center justify-center rounded-sm hover:bg-neutral-200/80',
@@ -526,6 +874,34 @@ const ToolbarButton = ({ onClick, isActive, icon: Icon }: ToolbarButtonProps) =>
 
 export const Toolbar = () => {
     const { editor } = useEditorStore()
+
+    const [youtubeOpen, setYoutubeOpen] = useState(false)
+    const [mathOpen, setMathOpen] = useState(false)
+    const [drawingOpen, setDrawingOpen] = useState(false)
+    const [aiGenerateOpen, setAiGenerateOpen] = useState(false);
+
+    const addYoutubeVideo = (url: string, width: number, height: number) => {
+        if (!editor) return
+        editor.chain().focus().setYoutubeVideo({
+            src: url,
+            width,
+            height
+        }).run()
+    }
+
+    const addMath = (formula: string, displayMode: boolean) => {
+        if (!editor) return
+
+        if (displayMode) {
+            editor.chain().focus().insertBlockMath({ latex: formula }).run()
+        } else {
+            editor.chain().focus().insertInlineMath({ latex: formula }).run()
+        }
+    }
+
+    const addDrawing = (dataUrl: string) => {
+        editor?.chain().focus().setImage({ src: dataUrl }).run()
+    }
 
     const sections: {
         label: string;
@@ -596,6 +972,46 @@ export const Toolbar = () => {
                     icon: RemoveFormattingIcon,
                     onClick: () => editor?.chain().focus().unsetAllMarks().run(),
                 },
+            ],
+            [
+                {
+                    label: 'CodeBlock',
+                    icon: Code,
+                    isActive: editor?.isActive('codeBlock'),
+                    onClick: () => editor?.chain().focus().toggleCodeBlock().run(),
+                },
+                {
+                    label: 'Quote',
+                    icon: QuoteIcon,
+                    isActive: editor?.isActive('quote'),
+                    onClick: () => editor?.chain().focus().toggleBlockquote().run(),
+                },
+                {
+                    label: 'Youtube',
+                    icon: YoutubeIcon,
+                    onClick: () => {
+                        setYoutubeOpen(true)
+                    },
+                },
+                {
+                    label: 'Math',
+                    icon: Sigma,
+                    onClick: () => {
+                        setMathOpen(true)
+                    },
+                },
+                {
+                    label: 'Drawing',
+                    icon: Brush,
+                    onClick: () => {
+                        setDrawingOpen(true)
+                    },
+                },
+                {
+                    label: 'Voice to text',
+                    icon: Mic,
+                    onClick: startVoiceToText
+                },
             ]
         ]
 
@@ -604,6 +1020,7 @@ export const Toolbar = () => {
             {sections[0].map((item) => (
                 <ToolbarButton key={item.label} {...item} />
             ))}
+
             <Separator orientation="vertical" className="h-6 bg-neutral-300" />
 
             <FontFamilyButton />
@@ -629,10 +1046,33 @@ export const Toolbar = () => {
             <LineHeightButton />
             <ListButton />
 
-
             {sections[2].map((item) => (
                 <ToolbarButton key={item.label} {...item} />
             ))}
+
+            <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
+            {sections[3].map((item) => (
+                <ToolbarButton key={item.label} {...item} />
+            ))}
+
+            <YoutubeModal
+                open={youtubeOpen}
+                onOpenChange={setYoutubeOpen}
+                onSubmit={addYoutubeVideo}
+            />
+
+            <MathModal
+                open={mathOpen}
+                onOpenChange={setMathOpen}
+                onSubmit={addMath}
+            />
+
+            <DrawingWindow
+                open={drawingOpen}
+                onClose={() => setDrawingOpen(false)}
+                onSubmit={addDrawing}
+            />
         </div>
     )
 }
