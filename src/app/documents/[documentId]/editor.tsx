@@ -119,7 +119,7 @@ export const Editor = ({ initialContent }: EditorProps) => {
                 types: ['heading', 'paragraph']
             }),
             Link.configure({
-                openOnClick: false,
+                openOnClick: true,
                 autolink: true,
                 defaultProtocol: 'https'
             }),
@@ -132,7 +132,9 @@ export const Editor = ({ initialContent }: EditorProps) => {
             Underline,
             // Image,
             ImageResize,
-            Table,
+            Table.configure({
+                resizable: true
+            }),
             TableCell,
             TableRow,
             TableHeader,

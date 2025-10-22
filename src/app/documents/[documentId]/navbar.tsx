@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { RenameDialog } from "@/components/rename-dialog";
 import { RemoveDialog } from "@/components/remove-dialog";
+import Meeting from "./meeting";
 
 interface NavbarProps {
     data: Doc<'documents'>
@@ -186,7 +187,7 @@ export const Navbar = ({ data }: NavbarProps) => {
                                 <MenubarTrigger className="text-sm font-normal py-0.5 px-[7px] rounded-sm hover:bg-muted h-auto">
                                     Chèn
                                 </MenubarTrigger>
-
+ 
                                 <MenubarContent>
                                     <MenubarSub>
                                         <MenubarSubTrigger>Bảng</MenubarSubTrigger>
@@ -297,6 +298,8 @@ export const Navbar = ({ data }: NavbarProps) => {
             <div className="flex gap-3 items-center pl-6">
                 <Avatars />
                 <Inbox />
+
+                <Meeting documentId={data._id}/>
 
                 <OrganizationSwitcher
                     afterCreateOrganizationUrl={'/'}

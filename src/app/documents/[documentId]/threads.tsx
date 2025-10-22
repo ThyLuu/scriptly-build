@@ -24,7 +24,7 @@ export function ThreadsList({ editor }: { editor: Editor | null }) {
             USER_UNKNOWN: "Ẩn danh",
             THREAD_COMPOSER_PLACEHOLDER: 'Phản hồi ...',
             THREAD_NEW_INDICATOR: 'Mới',
-            COMMENT_ADD_REACTION: 'Thêm phản ứng',
+            COMMENT_ADD_REACTION: 'Biểu tượng cảm xúc',
             COMMENT_DELETE: 'Xóa nhận xét',
             COMMENT_EDIT: 'Chỉnh sửa nhận xét',
             THREAD_RESOLVE: 'Đã giải quyết',
@@ -34,7 +34,20 @@ export function ThreadsList({ editor }: { editor: Editor | null }) {
             COMPOSER_INSERT_EMOJI: 'Chọn biểu tượng cảm xúc',
             COMPOSER_INSERT_MENTION: 'Nhắc đến ai đó',
             COMPOSER_PLACEHOLDER: 'Viết nhận xét ...',
-            COMPOSER_SEND: 'Gửi'
+            COMPOSER_SEND: 'Gửi',
+            COMMENT_MORE: 'Xem thêm',
+            COMMENT_EDITED: '(Đã chỉnh sửa)',
+            EMOJI_PICKER_SEARCH_PLACEHOLDER: 'Tìm kiếm biểu tượng cảm xúc',
+            COMMENT_EDIT_COMPOSER_SAVE: 'Lưu',
+            COMMENT_EDIT_COMPOSER_CANCEL: 'Hủy',
+            USER_SELF: 'Bạn',
+            COMMENT_REACTION_LIST(list, emoji, count) {
+                return (
+                    <>
+                        {list} đã phản ứng với {emoji}
+                    </>
+                )
+            }
         }}>
             <>
                 <div className="anchored-threads">

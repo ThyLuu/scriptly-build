@@ -51,12 +51,12 @@ export function Room({ children }: { children: ReactNode }) {
 
                 const reponse = await fetch(endpoint, {
                     method: 'POST',
+                    body: JSON.stringify({ room }),
                     // mới thêm vào
                     headers: {
                         "Content-Type": "application/json",
                     },
                     credentials: "include",
-                    body: JSON.stringify({ room })
                 })
 
                 return await reponse.json()

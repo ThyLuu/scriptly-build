@@ -41,10 +41,10 @@ const InboxMenu = () => {
                     </>
                 )
             },
-            INBOX_NOTIFICATION_THREAD_COMMENTS_LIST: (list, room, count) => {
+            INBOX_NOTIFICATION_THREAD_COMMENTS_LIST: (user, room, count) => {
                 return (
                     <>
-                        {list} và {count} người khác đã bình luận trong {room}
+                        {user} đã bình luận trong {room}
                     </>
                 )
             },
@@ -55,6 +55,8 @@ const InboxMenu = () => {
                     </>
                 )
             },
+            USER_SELF: 'Bạn',
+            USER_UNKNOWN: 'Ẩn danh',
         }}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

@@ -19,7 +19,7 @@ export const sendMessage = mutation({
         });
 
         // 🟢 update vào bảng chats
-await ctx.db.patch(args.chatId, { lastMessageAt: now });
+        await ctx.db.patch(args.chatId, { lastMessageAt: now });
     },
 })
 

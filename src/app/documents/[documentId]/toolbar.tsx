@@ -14,6 +14,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Rnd } from 'react-rnd'
 import { Tldraw, useEditor } from "tldraw";
 import 'tldraw/tldraw.css'
+import { api } from "../../../../convex/_generated/api";
+import { useMutation } from "convex/react";
+import { useUser } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 // interface AIGenerateProps {
 //     open: boolean;
@@ -592,26 +597,85 @@ const ImageButton = () => {
     const [imageUrl, setImageUrl] = useState("")
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
+    const { user } = useUser()
+    const params = useParams();
+    const { documentId } = useParams(); 
+
+    const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+    const getFileUrl = useMutation(api.files.getFileUrl);
+    const saveFile = useMutation(api.files.saveFile);
+
     const onChange = (src: string) => {
         editor?.chain().focus().setImage({ src }).run()
     }
 
+    // const onUpload = () => {
+    //     const input = document.createElement('input')
+    //     input.type = 'file'
+    //     input.accept = 'image/*'
+
+    //     input.onchange = (e) => {
+    //         const file = (e.target as HTMLInputElement).files?.[0]
+
+    //         if (file) {
+    //             const imageUrl = URL.createObjectURL(file)
+    //             onChange(imageUrl)
+    //         }
+    //     }
+
+    //     input.click()
+    // }
+
     const onUpload = () => {
-        const input = document.createElement('input')
-        input.type = 'file'
-        input.accept = 'image/*'
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
 
-        input.onchange = (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0]
+        input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
 
-            if (file) {
-                const imageUrl = URL.createObjectURL(file)
-                onChange(imageUrl)
+            try {
+                const uploadUrl = await generateUploadUrl({});
+
+                const res = await fetch(uploadUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": file.type },
+                    body: file,
+                });
+
+                const { storageId } = await res.json();
+
+                const fileUrl = await getFileUrl({ storageId });
+
+                if (fileUrl) {
+                    onChange(fileUrl);
+                }
+
+                // console.log("saveFile with:", {
+                //     documentId: documentId,
+                //     storageId,
+                //     fileName: file.name,
+                //     fileType: file.type,
+                //     fileSize: file.size,
+                //     uploadedBy: user?.primaryEmailAddress?.emailAddress || "Ẩn danh",
+                // });
+
+                await saveFile({
+                    documentId: documentId as Id<'documents'>,
+                    storageId,
+                    fileName: file.name,
+                    fileType: file.type,
+                    fileSize: file.size,
+                    uploadedBy: user?.primaryEmailAddress?.emailAddress || 'Ẩn danh',
+                });
+            } catch (err) {
+                console.error("Tải ảnh thất bại", err);
             }
-        }
+        };
 
-        input.click()
-    }
+        input.click();
+    };
 
     const handleImageUrlSubmit = () => {
         if (imageUrl) {
@@ -659,7 +723,7 @@ const ImageButton = () => {
                     />
 
                     <DialogFooter>
-                        <Button className="border-black border bg-white text-black hover:bg-neutral-200" onClick={handleImageUrlSubmit}>
+                        <Button className="bg-blue-500 text-white hover:bg-blue-600" onClick={handleImageUrlSubmit}>
                             Chèn
                         </Button>
                     </DialogFooter>
@@ -676,7 +740,15 @@ const LinkButton = () => {
     // console.log(editor?.getAttributes("link").href, "TEST");
 
     const onChange = (href: string) => {
-        editor?.chain().focus().extendMarkRange('link').setLink({ href }).run()
+        let finalHref = href.trim()
+
+        // Nếu không có http/https thì tự động thêm
+        if (!/^https?:\/\//i.test(finalHref)) {
+            finalHref = `https://${finalHref}`
+        }
+
+        // editor?.chain().focus().extendMarkRange('link').setLink({ href }).run()
+        editor?.chain().focus().extendMarkRange('link').setLink({ href: finalHref }).run()
         setValue('')
     };
 
@@ -700,7 +772,7 @@ const LinkButton = () => {
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
-                <Button onClick={() => onChange(value)} className="border-black border bg-white text-black hover:bg-neutral-200">
+                <Button onClick={() => onChange(value)} className="bg-blue-500 text-white hover:bg-blue-600">
                     Áp dụng
                 </Button>
             </DropdownMenuContent>

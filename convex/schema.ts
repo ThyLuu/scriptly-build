@@ -31,9 +31,20 @@ export default defineSchema({
     }).index("by_owner_id", ["ownerId"]),
 
     messages: defineTable({
-        chatId: v.id("chats"), 
-        senderId: v.string(), 
-        role: v.union(v.literal("user"), v.literal("ai")), 
-        content: v.string(), 
+        chatId: v.id("chats"),
+        senderId: v.string(),
+        role: v.union(v.literal("user"), v.literal("ai")),
+        content: v.string(),
     }).index("by_chat_id", ["chatId"]),
+
+    files: defineTable({
+        documentId: v.id("documents"),
+        storageId: v.id("_storage"),
+        fileName: v.string(),
+        fileType: v.string(),
+        fileSize: v.number(),
+        uploadedBy: v.string(),
+    })
+        .index("by_document_id", ["documentId"])
+        .index("by_uploaded_by", ["uploadedBy"]),
 })

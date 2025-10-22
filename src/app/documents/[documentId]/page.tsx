@@ -11,15 +11,13 @@ interface DocumentIdPageProps {
 const DocumentIdPage = async ({ params }: DocumentIdPageProps) => {
     const { documentId } = await params
 
-    // Lấy token server-side cho preloadQuery (SSR)
     const { getToken } = await auth()
     const token = (await getToken({ template: "convex" })) ?? undefined
 
     if (!token) {
-        throw new Error("Không được cấp phép")
+        throw new Error("[documents/documentId] Không được cấp phép hoặc đang lấy token ...")
     }
 
-    // Preload dữ liệu trước khi render (SSR)
     const preloadedDocument = await preloadQuery(
         api.documents.getById,
         { id: documentId },
@@ -29,8 +27,6 @@ const DocumentIdPage = async ({ params }: DocumentIdPageProps) => {
     if (!preloadedDocument) {
         throw new Error("Không tìm thấy tài liệu")
     }
-
-    console.log("Convex token (server):", token)
 
     return <Document preloadedDocument={preloadedDocument} />
 }

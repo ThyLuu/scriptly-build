@@ -34,7 +34,7 @@ export const DocumentRow = ({ document }: DocumentRowProps) => {
             </TableCell>
 
             <TableCell className="text-muted-foreground hidden md:table-cell">
-                {format(new Date(document._creationTime), 'dd MMM, yyyy', { locale: vi })}
+                {format(new Date(document._creationTime), 'HH:mm, dd MMM yyyy', { locale: vi })}
             </TableCell>
 
             <TableCell className="flex justify-end">
