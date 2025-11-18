@@ -1,6 +1,7 @@
 'use client'
 
 import { useEditor, EditorContent } from '@tiptap/react'
+import { getHierarchicalIndexes, TableOfContentData, TableOfContents } from '@tiptap/extension-table-of-contents'
 import StarterKit from '@tiptap/starter-kit'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
@@ -36,6 +37,8 @@ import css from 'highlight.js/lib/languages/css'
 import Youtube from '@tiptap/extension-youtube'
 import Math from '@tiptap/extension-mathematics'
 import 'katex/dist/katex.min.css'
+import type { Editor as TiptapEditor } from "@tiptap/react";
+import Heading from '@tiptap/extension-heading'
 // import { Dropcursor } from '@tiptap/extensions'
 
 const lowlight = createLowlight(all)
@@ -46,10 +49,12 @@ lowlight.register('js', javascript)
 lowlight.register('ts', typescript)
 
 interface EditorProps {
-    initialContent?: string | undefined
+    initialContent?: string | undefined;
+    onTocUpdate?: (items: TableOfContentData) => void;
+    onEditorCreate?: (editor: TiptapEditor) => void
 }
 
-export const Editor = ({ initialContent }: EditorProps) => {
+export const Editor = ({ initialContent, onTocUpdate, onEditorCreate }: EditorProps) => {
     const liveblocks = useLiveblocksExtension({
         initialContent,
         offlineSupport_experimental: true,
@@ -63,6 +68,7 @@ export const Editor = ({ initialContent }: EditorProps) => {
     const editor = useEditor({
         onCreate({ editor }) {
             setEditor(editor)
+            onEditorCreate?.(editor)
         },
         onDestroy() {
             setEditor(null)
@@ -97,6 +103,22 @@ export const Editor = ({ initialContent }: EditorProps) => {
             //     color: '#3B82F6',
             //     width: 2
             // }),
+            TableOfContents.configure({
+                getIndex: getHierarchicalIndexes,
+                onUpdate(content) {
+                    onTocUpdate?.(content)
+                }
+            }),
+            Heading.configure({ levels: [1, 2, 3, 4, 5] }).extend({
+                renderHTML({ node, HTMLAttributes }) {
+                    const id = node.attrs.id || `heading-${window.crypto.randomUUID()}`;
+                    return [
+                        `h${node.attrs.level}`,
+                        { ...HTMLAttributes, 'data-toc-id': id },
+                        0,
+                    ]
+                }
+            }),
             Math.configure({
                 katexOptions: {
                     throwOnError: false
@@ -109,6 +131,7 @@ export const Editor = ({ initialContent }: EditorProps) => {
             // }),
             StarterKit.configure({
                 history: false,
+                heading: false,
             }),
             LineHeightExtension.configure({
                 types: ['heading', 'paragraph'],

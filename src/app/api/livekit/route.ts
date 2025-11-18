@@ -42,18 +42,14 @@
 // }
 
 
-
-
-
-
-
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { AccessToken } from "livekit-server-sdk";
 
 export async function GET(req: Request) {
     const user = await currentUser();
-    
+    // console.log("currentUser:", user);
+
     if (!user) {
         return NextResponse.json({ error: "LiveKit: Không cấp phép" }, { status: 401 });
     }
@@ -70,7 +66,7 @@ export async function GET(req: Request) {
     const at = new AccessToken(apiKey, apiSecret, {
         identity: user.id,
         name: user.fullName || "Ẩn danh",
-        ttl: 60, // token sống 60 giây
+        ttl: 6000, // token sống 6000 giây
     });
 
     at.addGrant({

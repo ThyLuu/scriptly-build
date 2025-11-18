@@ -251,19 +251,86 @@ const VideoGrid = ({ tracks }: { tracks: any[] }) => {
 };
 
 // Custom Participant Tile
+// const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boolean }) => {
+//     const { participant } = track;
+//     const isLocal = participant instanceof LocalParticipant;
+//     const meta = participant.metadata ? JSON.parse(participant.metadata) : {};
+//     const isCameraOn = participant.isCameraEnabled && track.publication?.track;
+
+//     return (
+//         <div className={`relative bg-gray-800 rounded-lg overflow-hidden ${isSingle ? "w-full h-full" : "aspect-video"} group`}>
+//             {isCameraOn ? (
+//                 <VideoTrack
+//                     trackRef={track}
+//                     className="w-full h-full object-cover"
+//                 />
+//             ) : (
+//                 <div className="flex items-center justify-center h-full bg-gradient-to-br">
+//                     {meta.avatar ? (
+//                         <img
+//                             src={meta.avatar}
+//                             alt={participant.name || participant.identity}
+//                             className="w-24 h-24 rounded-full border-4 border-white"
+//                         />
+//                     ) : (
+//                         <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+//                             {(participant.name || participant.identity)?.[0]?.toUpperCase()}
+//                         </div>
+//                     )}
+//                 </div>
+//             )}
+
+//             {/* Participant Info Overlay */}
+//             <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+//                 {participant.name || participant.identity}
+//                 {isLocal && ' (Bạn)'}
+//             </div>
+
+//             {/* Mute Indicators */}
+//             <div className="absolute top-2 right-2 flex gap-1">
+//                 {participant.isMicrophoneEnabled === false && (
+//                     <div className="bg-red-500 p-1 rounded">
+//                         <MicOff size={16} className="text-white" />
+//                     </div>
+//                 )}
+//                 {participant.isCameraEnabled === false && (
+//                     <div className="bg-red-500 p-1 rounded">
+//                         <VideoOff size={16} className="text-white" />
+//                     </div>
+//                 )}
+//             </div>
+
+//             {/* Connection Quality (optional) */}
+//             <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+//                 <div className="flex gap-1">
+//                     {[1, 2, 3, 4].map((i) => (
+//                         <div key={i} className="w-1 h-3 bg-green-500 rounded"></div>
+//                     ))}
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+
 const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boolean }) => {
     const { participant } = track;
     const isLocal = participant instanceof LocalParticipant;
     const meta = participant.metadata ? JSON.parse(participant.metadata) : {};
-    const isCameraOn = participant.isCameraEnabled && track.publication?.track;
+    const isCameraTrack = track.source === Track.Source.Camera;
+    const isScreenShareTrack = track.source === Track.Source.ScreenShare;
+    const hasVideoTrack = track.publication?.track;
+
+    // Điều kiện hiển thị video:
+    const shouldShowVideo =
+        hasVideoTrack && (isScreenShareTrack || (isCameraTrack && participant.isCameraEnabled));
 
     return (
-        <div className={`relative bg-gray-800 rounded-lg overflow-hidden ${isSingle ? "w-full h-full" : "aspect-video"} group`}>
-            {isCameraOn ? (
-                <VideoTrack
-                    trackRef={track}
-                    className="w-full h-full object-cover"
-                />
+        <div
+            className={`relative bg-gray-800 rounded-lg overflow-hidden ${isSingle ? "w-full h-full" : "aspect-video"
+                } group`}
+        >
+            {shouldShowVideo ? (
+                <VideoTrack trackRef={track} className="w-full h-full object-cover" />
             ) : (
                 <div className="flex items-center justify-center h-full bg-gradient-to-br">
                     {meta.avatar ? (
@@ -280,34 +347,27 @@ const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boo
                 </div>
             )}
 
-            {/* Participant Info Overlay */}
+            {/* Info */}
             <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                 {participant.name || participant.identity}
                 {isLocal && ' (Bạn)'}
             </div>
 
             {/* Mute Indicators */}
-            <div className="absolute top-2 right-2 flex gap-1">
-                {participant.isMicrophoneEnabled === false && (
-                    <div className="bg-red-500 p-1 rounded">
-                        <MicOff size={16} className="text-white" />
-                    </div>
-                )}
-                {participant.isCameraEnabled === false && (
-                    <div className="bg-red-500 p-1 rounded">
-                        <VideoOff size={16} className="text-white" />
-                    </div>
-                )}
-            </div>
-
-            {/* Connection Quality (optional) */}
-            <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="w-1 h-3 bg-green-500 rounded"></div>
-                    ))}
+            {isCameraTrack && (
+                <div className="absolute top-2 right-2 flex gap-1">
+                    {!participant.isMicrophoneEnabled && (
+                        <div className="bg-red-500 p-1 rounded">
+                            <MicOff size={16} className="text-white" />
+                        </div>
+                    )}
+                    {!participant.isCameraEnabled && (
+                        <div className="bg-red-500 p-1 rounded">
+                            <VideoOff size={16} className="text-white" />
+                        </div>
+                    )}
                 </div>
-            </div>
+            )}
         </div>
     );
 };
@@ -355,11 +415,14 @@ const ControlBar = ({ onToggleChat, onToggleSettings, onToggleParticipants, unre
                 await localParticipant.setScreenShareEnabled(false);
                 setIsScreenSharing(false);
             } else {
-                await localParticipant.setScreenShareEnabled(true);
+                const result = await localParticipant.setScreenShareEnabled(true);
+                console.log("ScreenShare track started:", result);
                 setIsScreenSharing(true);
             }
         } catch (error) {
-            console.error('Lỗi chia sẻ màn hình:', error);
+            console.log('Lỗi chia sẻ màn hình:', error);
+
+            // console.error('Lỗi chia sẻ màn hình:', error);
         }
     };
 
