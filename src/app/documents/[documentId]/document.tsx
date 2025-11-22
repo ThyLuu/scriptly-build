@@ -11,17 +11,23 @@ import { TableOfContent } from "./table-of-content";
 import { useState } from "react";
 
 import type { Editor as TiptapEditor } from "@tiptap/react";
-import type { TableOfContentData } from "@tiptap/extension-table-of-contents";
+// import type { TableOfContentData } from "@tiptap/extension-table-of-contents";
 
 interface DocumentProps {
     preloadedDocument: Preloaded<typeof api.documents.getById>
+}
+
+interface TocItem {
+    id: string;
+    textContent: string;
+    level: number;
 }
 
 export const Document = ({ preloadedDocument }: DocumentProps) => {
     const document = usePreloadedQuery(preloadedDocument)
 
     const [editor, setEditor] = useState<TiptapEditor | null>(null)
-    const [tocItems, setTocItems] = useState<TableOfContentData>([])
+    const [tocItems, setTocItems] = useState<TocItem[]>([])
 
     return (
         <Room>
