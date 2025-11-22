@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { LiveKitRoom, useLocalParticipant, useRemoteParticipants, useTracks, useRoomContext, useConnectionState, VideoTrack, RoomAudioRenderer, useParticipants } from '@livekit/components-react';
 import { Track, RemoteParticipant, LocalParticipant, ConnectionState as LiveKitConnectionState } from 'livekit-client';
 import { Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, Phone, MessageSquare, Settings, Users, Copy, } from 'lucide-react';
+import type { RoomOptions } from 'livekit-client';
+import type { TrackReferenceOrPlaceholder } from '@livekit/components-core';
+import type { Participant } from 'livekit-client';
 
 interface CustomVideoConferenceProps {
     token: string;
     serverUrl: string;
-    options?: any;
+    options?: RoomOptions;
 }
 
 interface ChatMessage {
@@ -182,6 +185,8 @@ const ParticipantAvatars = () => {
                         <img
                             src={meta.avatar || '/default-avatar.png'}
                             alt={p.name || p.identity}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full border-2 border-gray-800 hover:border-blue-500 transition-colors"
                         />
                         <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -200,7 +205,7 @@ const ParticipantAvatars = () => {
 };
 
 // Video Grid Component
-const VideoGrid = ({ tracks }: { tracks: any[] }) => {
+const VideoGrid = ({ tracks }: { tracks: TrackReferenceOrPlaceholder[] }) => {
     const screenShareTracks = tracks.filter(
         t => t.source === Track.Source.ScreenShare && t.publication?.track
     );
@@ -312,7 +317,7 @@ const VideoGrid = ({ tracks }: { tracks: any[] }) => {
 //     );
 // };
 
-const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boolean }) => {
+const CustomParticipantTile = ({ track, isSingle }: { track: TrackReferenceOrPlaceholder; isSingle?: boolean }) => {
     const { participant } = track;
     const isLocal = participant instanceof LocalParticipant;
     const meta = participant.metadata ? JSON.parse(participant.metadata) : {};
@@ -330,6 +335,7 @@ const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boo
                 } group`}
         >
             {shouldShowVideo ? (
+                // @ts-expect-error - TrackReferenceOrPlaceholder type mismatch với VideoTrack
                 <VideoTrack trackRef={track} className="w-full h-full object-cover" />
             ) : (
                 <div className="flex items-center justify-center h-full bg-gradient-to-br">
@@ -337,6 +343,8 @@ const CustomParticipantTile = ({ track, isSingle }: { track: any; isSingle?: boo
                         <img
                             src={meta.avatar}
                             alt={participant.name || participant.identity}
+                            width={96}
+                            height={96}
                             className="w-24 h-24 rounded-full border-4 border-white"
                         />
                     ) : (
@@ -388,9 +396,9 @@ const ControlBar = ({ onToggleChat, onToggleSettings, onToggleParticipants, unre
     const toggleMicrophone = async () => {
         try {
             await localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled);
-        } catch (error: any) {
-            if (error.name === 'NotAllowedError') {
-                setPermissionDenied(true)
+        } catch (error: unknown) {
+            if (error instanceof DOMException && error.name === 'NotAllowedError') {
+                setPermissionDenied(true);
                 return;
             }
             console.error("Lỗi bật/tắt micro:", error);
@@ -400,9 +408,9 @@ const ControlBar = ({ onToggleChat, onToggleSettings, onToggleParticipants, unre
     const toggleCamera = async () => {
         try {
             await localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled);
-        } catch (error: any) {
-            if (error.name === 'NotAllowedError') {
-                setPermissionDenied(true)
+        } catch (error: unknown) {
+            if (error instanceof DOMException && error.name === 'NotAllowedError') {
+                setPermissionDenied(true);
                 return;
             }
             console.error("Lỗi bật/tắt camera:", error);
@@ -637,7 +645,7 @@ const ParticipantsPanel = ({ onClose }: { onClose: () => void }) => {
     const participants = useRemoteParticipants();
     const { localParticipant } = useLocalParticipant();
 
-    const renderAvatar = (participant: any, size: number = 32) => {
+    const renderAvatar = (participant: Participant, size: number = 32) => {
         let avatarUrl: string | null = null;
 
         if (participant.metadata) {
@@ -649,9 +657,9 @@ const ParticipantsPanel = ({ onClose }: { onClose: () => void }) => {
             }
         }
 
-        if (!avatarUrl && participant.identity) {
-            avatarUrl = participant.identityAvatar || null; // Tùy LiveKit setup
-        }
+        // if (!avatarUrl && participant.identity) {
+        //     avatarUrl = participant.identityAvatar || null; // Tùy LiveKit setup
+        // }
 
         if (avatarUrl) {
             return (
@@ -743,7 +751,7 @@ const SettingsPanel = ({ onClose }: { onClose: () => void }) => {
                     microphones: deviceList.filter(device => device.kind === 'audioinput'),
                     cameras: deviceList.filter(device => device.kind === 'videoinput')
                 });
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Lỗi lấy danh sách thiết bị:', error);
             }
         };

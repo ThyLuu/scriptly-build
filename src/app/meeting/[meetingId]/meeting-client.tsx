@@ -37,10 +37,16 @@ export default function MeetingClient({ meetingId }: MeetingClientProps) {
 
         useEffect(() => {
         if (!isLoaded || !isSignedIn) return;
+        
         const fetchToken = async () => {
             try {
                 const res = await fetch(`/api/livekit?meetingId=${meetingId}`);
-                if (!res.ok) throw new Error("Không thể kết nối đến server");
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || "Không thể kết nối đến server");
+                }
+
                 const data = await res.json();
                 setToken(data.token);
             } catch (err) {
@@ -49,7 +55,11 @@ export default function MeetingClient({ meetingId }: MeetingClientProps) {
                 setLoading(false);
             }
         };
-        fetchToken();
+
+        fetchToken()
+        
+        const interval = setInterval(fetchToken, 50_000)
+        return () => clearInterval(interval)
     }, [isLoaded, isSignedIn, meetingId]);
 
     if (!isLoaded)

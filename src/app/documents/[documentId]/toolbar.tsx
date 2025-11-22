@@ -4,21 +4,24 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
-import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, Brush, ChevronDownIcon, Code, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, Mic, MinusIcon, PlusIcon, PrinterIcon, QuoteIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, Sigma, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon, WandSparkles, YoutubeIcon } from "lucide-react";
+import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, Brush, ChevronDownIcon, Code, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, Mic, MinusIcon, PlusIcon, PrinterIcon, QuoteIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, Sigma, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon, YoutubeIcon } from "lucide-react";
 import { type Level } from '@tiptap/extension-heading'
 import { type ColorResult, SketchPicker } from 'react-color'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Rnd } from 'react-rnd'
-import { Tldraw, useEditor } from "tldraw";
+import { Tldraw } from "tldraw";
 import 'tldraw/tldraw.css'
 import { api } from "../../../../convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { Id } from "../../../../convex/_generated/dataModel";
+// import { Editor } from '@tiptap/react'
+// import { Editor as TiptapEditor } from '@tiptap/react'
+import { Editor as TldrawEditor } from 'tldraw'
 
 // interface AIGenerateProps {
 //     open: boolean;
@@ -125,23 +128,24 @@ interface DrawingWindowProps {
     onSubmit: (dataUrl: string) => void;
 }
 
-function Helper() {
-    const editor = useEditor();
+// function Helper() {
+//     const editor = useEditor();
 
-    useEffect(() => {
-        const container = editor.getContainer();
-        const focusOnPointerDown = () => editor.focus();
-        container.addEventListener('pointerdown', focusOnPointerDown);
-        return () => {
-            container.removeEventListener('pointerdown', focusOnPointerDown);
-        };
-    }, [editor]);
+//     useEffect(() => {
+//         const container = editor.getContainer();
+//         const focusOnPointerDown = () => editor.focus();
+//         container.addEventListener('pointerdown', focusOnPointerDown);
+//         return () => {
+//             container.removeEventListener('pointerdown', focusOnPointerDown);
+//         };
+//     }, [editor]);
 
-    return null;
-}
+//     return null;
+// }
 
 const DrawingWindow = ({ open, onClose, onSubmit }: DrawingWindowProps) => {
-    const [editor, setEditor] = useState<any>(null);
+    // const [editor, setEditor] = useState<any>(null);
+    const [editor, setEditor] = useState<TldrawEditor | null>(null);
 
     if (!open) return null;
 
@@ -207,9 +211,18 @@ const DrawingWindow = ({ open, onClose, onSubmit }: DrawingWindowProps) => {
     );
 }
 
+interface SpeechRecognitionEvent extends Event {
+    results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+    error: string;
+}
+
 function startVoiceToText() {
-    // @ts-ignore
+    // @ts-expect-error - SpeechRecognition chưa có type đầy đủ
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
     if (!SpeechRecognition) {
         alert("Trình duyệt của bạn không hỗ trợ Speech Recognition.")
         return
@@ -226,8 +239,8 @@ function startVoiceToText() {
         console.log("Đang nghe giọng nói...")
     };
 
-    // Dùng any thay vì SpeechRecognitionEvent
-    recognition.onresult = (event: any) => {
+    // recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript
         console.log("Kết quả chuyển đổi:", transcript)
 
@@ -236,7 +249,8 @@ function startVoiceToText() {
         editor?.chain().focus().insertContent(transcript).run()
     }
 
-    recognition.onerror = (event: any) => {
+    // recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         if (event.error === "not-allowed") {
             return;
         }
@@ -312,7 +326,7 @@ const YoutubeModal = ({ open, onOpenChange, onSubmit }: YoutubeModalProps) => {
     const [url, setUrl] = useState("")
     const [width, setWidth] = useState(640)
     const [height, setHeight] = useState(480)
-    const [align, setAlign] = useState<"left" | "center" | "right">("center")
+    // const [align, setAlign] = useState<"left" | "center" | "right">("center")
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -598,8 +612,8 @@ const ImageButton = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const { user } = useUser()
-    const params = useParams();
-    const { documentId } = useParams(); 
+    // const params = useParams();
+    const { documentId } = useParams();
 
     const generateUploadUrl = useMutation(api.files.generateUploadUrl);
     const getFileUrl = useMutation(api.files.getFileUrl);
@@ -950,7 +964,7 @@ export const Toolbar = () => {
     const [youtubeOpen, setYoutubeOpen] = useState(false)
     const [mathOpen, setMathOpen] = useState(false)
     const [drawingOpen, setDrawingOpen] = useState(false)
-    const [aiGenerateOpen, setAiGenerateOpen] = useState(false);
+    // const [aiGenerateOpen, setAiGenerateOpen] = useState(false);
 
     const addYoutubeVideo = (url: string, width: number, height: number) => {
         if (!editor) return

@@ -41,7 +41,7 @@ export function ThreadsList({ editor }: { editor: Editor | null }) {
             COMMENT_EDIT_COMPOSER_SAVE: 'Lưu',
             COMMENT_EDIT_COMPOSER_CANCEL: 'Hủy',
             USER_SELF: 'Bạn',
-            COMMENT_REACTION_LIST(list, emoji, count) {
+            COMMENT_REACTION_LIST(list, emoji) {
                 return (
                     <>
                         {list} đã phản ứng với {emoji}

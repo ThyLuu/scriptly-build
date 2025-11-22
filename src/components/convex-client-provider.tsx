@@ -3,17 +3,18 @@
 import { ConvexReactClient, Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { ReactNode } from "react";
 import { ConvexProviderWithClerk } from 'convex/react-clerk'
-import { ClerkProvider, useAuth, SignIn } from '@clerk/nextjs'
+import { ClerkProvider, useAuth } from '@clerk/nextjs'
 import { FullscreenLoader } from "./fullscreen-loader";
 import { viVN } from '@clerk/localizations'
 import { LandingPage } from "./landing-page";
 import { useSyncUser } from "@/hooks/use-sync-user";
+import type { LocalizationResource } from '@clerk/types'
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
     return (
-        <ClerkProvider localization={viVN as any} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>
+        <ClerkProvider localization={viVN as LocalizationResource} publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>
             <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
                 <Authenticated>
                     {/* {children} */}

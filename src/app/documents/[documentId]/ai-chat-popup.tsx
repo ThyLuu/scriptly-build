@@ -111,7 +111,7 @@ export default function AiChatPopup() {
                     <Sparkles />
                 </button>
             </PopoverTrigger>
-            
+
             <PopoverContent
                 side="top"
                 className="w-96 h-[500px] bg-white shadow-lg rounded-xl flex flex-col z-50"
@@ -258,7 +258,7 @@ export default function AiChatPopup() {
                                 >
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}
                                         components={{
-                                            table: ({ node, ...props }) => (
+                                            table: ({ ...props }) => (
                                                 <ScrollArea className="w-full rounded-xl border p-2 bg-white">
                                                     <div className="min-w-max">
                                                         <table
@@ -273,13 +273,13 @@ export default function AiChatPopup() {
                                                     />
                                                 </ScrollArea>
                                             ),
-                                            th: ({ node, ...props }) => (
+                                            th: ({ ...props }) => (
                                                 <th
                                                     className="border border-gray-300 px-4 py-2 bg-gray-100 font-semibold text-left"
                                                     {...props}
                                                 />
                                             ),
-                                            td: ({ node, ...props }) => (
+                                            td: ({ ...props }) => (
                                                 <td
                                                     className="border border-gray-300 px-4 py-2 hover:bg-gray-50 transition-colors"
                                                     {...props}
@@ -322,7 +322,7 @@ export default function AiChatPopup() {
                             onClick={handleSend}
                             className="px-4 py-2 bg-blue-500 text-white rounded-lg"
                         >
-                            <SendHorizonalIcon className="size-4"/>
+                            <SendHorizonalIcon className="size-4" />
                         </button>
                     </div>
                 )}

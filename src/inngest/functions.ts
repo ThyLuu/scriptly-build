@@ -27,9 +27,10 @@ function filterToxic(text: string) {
 
 // Gọi API Gemini (AI) để lấy câu trả lời từ message.
 // Tự động retry nếu API fail (mạng, timeout, lỗi tạm thời).
-async function callGeminiWithRetry(step: any, body: any, retries = 2) {
+async function callGeminiWithRetry(step: unknown, body: unknown, retries = 2) {
     for (let i = 0; i <= retries; i++) {
         try {
+            // @ts-expect-error - Inngest step types are complex
             return await step.ai.infer("ai-chat-call", body);
         } catch (err) {
             console.error("AI call failed, retrying...", i, err);
@@ -38,13 +39,19 @@ async function callGeminiWithRetry(step: any, body: any, retries = 2) {
     }
 }
 
+interface GeminiCandidate {
+    content: {
+        parts: Array<{ text?: string }>;
+    };
+}
+
 export const aiChat = inngest.createFunction(
     { id: "ai-chat" },
     { event: "ai-chat" },
     async ({ event, step }) => {
         const userMessage = preprocessMessage(event.data.message);
         const chatId = event.data.chatId;
-        const senderId = event.data.senderId;
+        // const senderId = event.data.senderId;
 
         // Lấy lịch sử chat gần nhất (5 tin nhắn)
         const recentMessages = await fetchQuery(api.messages.getMessages, { chatId });
@@ -77,10 +84,11 @@ export const aiChat = inngest.createFunction(
         const aiResp = await callGeminiWithRetry(step, body);
 
         // Chọn candidate tốt nhất
-        const candidates = aiResp?.candidates ?? [];
+        const candidates = (aiResp?.candidates ?? []) as GeminiCandidate[];
         let aiText = "Xin lỗi, hãy thử lại sau.";
+
         if (candidates.length > 0) {
-            aiText = candidates.reduce((prev: string, cur: any) => {
+            aiText = candidates.reduce((prev: string, cur: GeminiCandidate) => {
                 const text = cur.content.parts[0]?.text ?? "";
                 return text.length > prev.length ? text : prev;
             }, "");

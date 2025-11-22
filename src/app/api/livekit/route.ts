@@ -51,17 +51,24 @@ export async function GET(req: Request) {
     // console.log("currentUser:", user);
 
     if (!user) {
-        return NextResponse.json({ error: "LiveKit: Không cấp phép" }, { status: 401 });
+        console.log("LiveKit API: User not authenticated");
+        return NextResponse.json({ error: "LiveKit: Không cấp phép, hãy đăng nhập để tham gia cuộc họp" }, { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url);
-    const meetingId = searchParams.get("meetingId");
+    const { searchParams } = new URL(req.url)
+    const meetingId = searchParams.get("meetingId")
     if (!meetingId) {
-        return NextResponse.json({ error: "LiveKit: Thiếu meetingId" }, { status: 400 });
+        console.log("LiveKit API: Missing meetingId")
+        return NextResponse.json({ error: "LiveKit: Thiếu meetingId" }, { status: 400 })
     }
 
     const apiKey = process.env.LIVEKIT_API_KEY!;
     const apiSecret = process.env.LIVEKIT_API_SECRET!;
+
+    if (!apiKey || !apiSecret) {
+        console.error("LiveKit API: Missing environment variables");
+        return NextResponse.json({ error: "Cấu hình server không đầy đủ" }, { status: 500 })
+    }
 
     const at = new AccessToken(apiKey, apiSecret, {
         identity: user.id,

@@ -15,8 +15,13 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ runId: run.ids?.[0] });
-    } catch (error: any) {
-        console.error("❌ Error in ai-chat route:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        // } catch (error: any) {
+        //     console.error("❌ Error in ai-chat route:", error);
+        //     return NextResponse.json({ error: error.message }, { status: 500 });
+        // }
+    } catch (error: unknown) {
+        console.error("Error in ai-chat route: ", error);
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

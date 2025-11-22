@@ -41,7 +41,7 @@ const InboxMenu = () => {
                     </>
                 )
             },
-            INBOX_NOTIFICATION_THREAD_COMMENTS_LIST: (user, room, count) => {
+            INBOX_NOTIFICATION_THREAD_COMMENTS_LIST: (user, room) => {
                 return (
                     <>
                         {user} đã bình luận trong {room}

@@ -4,15 +4,28 @@ import { TextSelection } from "@tiptap/pm/state";
 import { Editor } from "@tiptap/react";
 import { X } from "lucide-react";
 
+interface TocItem {
+    id: string;
+    textContent: string;
+    level: number;
+}
+
 interface TableOfContentProps {
     editor: Editor | null;
-    items: any[];
-    onTocUpdate?: (items: any[]) => void;
+    items: TocItem[];
+    onTocUpdate?: (items: TocItem[]) => void;
 }
+
+// interface TableOfContentProps {
+//     editor: Editor | null;
+//     items: any[];
+//     onTocUpdate?: (items: any[]) => void;
+// }
 
 export const TableOfContent = ({ editor, items = [], onTocUpdate }: TableOfContentProps) => {
 
-    const onItemClick = (e: any, id: string) => {
+    // const onItemClick = (e: any, id: string) => {
+    const onItemClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
         e.preventDefault();
         if (!editor) return;
 
