@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { Id } from "../../../../convex/_generated/dataModel";
@@ -28,12 +27,11 @@ export default function DocumentHistory({
     const [isDeleting, setIsDeleting] = useState(false);
     const [description, setDescription] = useState("");
     const [editDescription, setEditDescription] = useState("");
-
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const { editor } = useEditorStore();
     const { createSnapshot } = useVersionHistory(documentId, roomId);
     const deleteVersion = useMutation(api.documentVersions.deleteVersion);
     const updateDescription = useMutation(api.documentVersions.updateVersionDescription);
-
     const convexVersions = useQuery(api.documentVersions.getDocumentVersions, {
         documentId,
     });
@@ -50,11 +48,9 @@ export default function DocumentHistory({
         }
     }, [selectedVersion]);
 
-
     // Restore version
     const handleRestoreVersion = useCallback(async () => {
         if (!selectedVersion || !editor) return;
-
         try {
             editor.commands.setContent(selectedVersion.content);
             toast.success("Khôi phục phiên bản thành công");
@@ -68,19 +64,13 @@ export default function DocumentHistory({
     const handleDeleteVersion = useCallback(async () => {
         if (!selectedVersion) return;
 
-        const confirmed = window.confirm(
-            "Bạn có chắn chăn muốn xóa phiên bản này không? Hành động này không thể hoàn tác"
-        );
-
-        if (!confirmed) return;
-
         setIsDeleting(true);
         try {
             await deleteVersion({
                 versionId: selectedVersion._id,
             });
-
             setSelectedVersionId(undefined);
+            setDeleteDialogOpen(false);
             toast.success("Đã xóa phiên bản!");
         } catch (error) {
             console.error("Failed to delete version:", error);
@@ -96,18 +86,15 @@ export default function DocumentHistory({
             toast.error("Trình soạn thảo chưa sẵn sàng");
             return;
         }
-
         setIsSaving(true);
         try {
             const content = editor.getHTML();
             const timestamp = new Date().toISOString();
-
             if (!content || content.trim() === "" || content.trim() === "<p></p>") {
                 toast.error("Không thể lưu phiên bản trống!");
                 setIsSaving(false);
                 return;
             }
-
             await createSnapshot(
                 timestamp,
                 content,
@@ -116,7 +103,6 @@ export default function DocumentHistory({
                 userName,
                 description || undefined
             );
-
             setDescription("");
             toast.success("Đã lưu phiên bản!");
         } catch (error) {
@@ -129,20 +115,17 @@ export default function DocumentHistory({
 
     const handleUpdateDescription = useCallback(async () => {
         if (!selectedVersion) return;
-
         try {
             await updateDescription({
                 versionId: selectedVersion._id,
                 description: editDescription,
             });
-
             toast.success("Mô tả đã được cập nhật!");
         } catch (error) {
             console.error("Failed to update description:", error);
             toast.error("Lỗi khi cập nhật mô tả");
         }
     }, [selectedVersion, editDescription, updateDescription]);
-
 
     return (
         <>
@@ -159,7 +142,6 @@ export default function DocumentHistory({
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-200">
-
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
                             <div className="flex items-center gap-2">
@@ -176,10 +158,8 @@ export default function DocumentHistory({
 
                         {/* Content */}
                         <div className="flex-1 flex overflow-hidden">
-
                             {/* Sidebar */}
                             <div className="w-72 border-r bg-gray-50 flex flex-col">
-
                                 {/* Save new version */}
                                 <div className="p-4 border-b space-y-3">
                                     <h3 className="text-sm font-semibold text-gray-700">Tạo phiên bản mới</h3>
@@ -203,7 +183,6 @@ export default function DocumentHistory({
                                 {/* Version list */}
                                 <div className="flex-1 overflow-y-auto p-4 space-y-2">
                                     <h3 className="text-sm font-semibold text-gray-700 mb-3">Danh sách phiên bản</h3>
-
                                     {!convexVersions ? (
                                         <div className="text-gray-500 text-sm">Đang tải...</div>
                                     ) : convexVersions.length === 0 ? (
@@ -221,11 +200,9 @@ export default function DocumentHistory({
                                                 <div className="text-xs font-semibold">
                                                     {new Date(v._creationTime).toLocaleString()}
                                                 </div>
-
                                                 {v.description && (
                                                     <div className="text-xs opacity-70 truncate">{v.description}</div>
                                                 )}
-
                                                 {v.createdByName && (
                                                     <div className="text-[11px] opacity-60 mt-1">
                                                         bởi {v.createdByName}
@@ -244,14 +221,13 @@ export default function DocumentHistory({
                                         {/* Action Bar */}
                                         <div className="flex items-center justify-between mb-4">
                                             <h3 className="font-semibold text-gray-800 text-lg">Xem trước</h3>
-
                                             <div className="flex items-center gap-2">
-
                                                 {/* Edit description */}
                                                 <div className="flex items-center gap-2">
                                                     <input
                                                         type="text"
                                                         className="px-3 py-2 w-56 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
+                                                        placeholder={selectedVersion?.description ? "" : "Nhập mô tả (tùy chọn)"}
                                                         value={editDescription}
                                                         onChange={(e) => setEditDescription(e.target.value)}
                                                     />
@@ -274,7 +250,7 @@ export default function DocumentHistory({
 
                                                 {/* Delete */}
                                                 <button
-                                                    onClick={handleDeleteVersion}
+                                                    onClick={() => setDeleteDialogOpen(true)}
                                                     disabled={isDeleting}
                                                     className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:bg-red-300 flex items-center gap-1"
                                                 >
@@ -303,8 +279,48 @@ export default function DocumentHistory({
                 </div>
             )}
 
+            {/* Delete Confirmation Dialog */}
+            {deleteDialogOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl max-w-sm w-full border border-gray-200">
+                        {/* Header */}
+                        <div className="px-6 py-4 border-b">
+                            <h3 className="text-lg font-semibold text-gray-900">Xóa phiên bản</h3>
+                        </div>
 
+                        {/* Body */}
+                        <div className="px-6 py-4">
+                            <p className="text-gray-600 text-sm">
+                                Bạn có chắc chắn muốn xóa phiên bản này không? Hành động này không thể hoàn tác.
+                            </p>
+                            {selectedVersion?.description && (
+                                <div className="mt-3 p-3 bg-gray-100 rounded text-sm text-gray-700">
+                                    <span className="font-medium">Mô tả: </span>{selectedVersion.description}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 py-4 border-t flex items-center justify-end gap-3">
+                            <button
+                                onClick={() => setDeleteDialogOpen(false)}
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleDeleteVersion}
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-400 flex items-center gap-2"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                {isDeleting ? "Đang xóa..." : "Xóa"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
-
