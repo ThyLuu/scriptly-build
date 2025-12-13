@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
-import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, Brush, ChevronDownIcon, Code, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, Mic, MinusIcon, PlusIcon, PrinterIcon, QuoteIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, Sigma, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon, YoutubeIcon } from "lucide-react";
+import { AlignCenterIcon, AlignJustifyIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, Bot, Brush, ChevronDownIcon, Code, HighlighterIcon, ImageIcon, ItalicIcon, Link2Icon, ListCollapseIcon, ListIcon, ListOrderedIcon, ListTodoIcon, Loader2Icon, LucideIcon, MessageSquarePlusIcon, Mic, MinusIcon, PlusIcon, PrinterIcon, QuoteIcon, Redo2Icon, RemoveFormattingIcon, SearchIcon, Sigma, SpellCheckIcon, UnderlineIcon, Undo2Icon, UploadIcon, YoutubeIcon } from "lucide-react";
 import { type Level } from '@tiptap/extension-heading'
 import { type ColorResult, SketchPicker } from 'react-color'
 import { useState } from "react";
@@ -22,105 +22,283 @@ import { Id } from "../../../../convex/_generated/dataModel";
 // import { Editor } from '@tiptap/react'
 // import { Editor as TiptapEditor } from '@tiptap/react'
 import { Editor as TldrawEditor } from 'tldraw'
+import ReactMarkdown from "react-markdown"
+import type { Editor } from "@tiptap/core"
 
-// interface AIGenerateProps {
-//     open: boolean;
-//     onOpenChange: (open: boolean) => void;
-// }
+interface AiEditorAction {
+    action: "summarize" | "rewrite" | "generate" | "custom";
+    customPrompt?: string;
+}
 
-// interface AIGenerateProps {
-//     open: boolean;
-//     onOpenChange: (open: boolean) => void;
-// }
+interface AIEditorProps {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    editor: Editor | null
+}
 
-// export const AIGenerate = ({ open, onOpenChange }: AIGenerateProps) => {
-//     const [aiPrompt, setAiPrompt] = useState("");
-//     const [aiResult, setAiResult] = useState<string | null>(null);
-//     const [loading, setLoading] = useState(false);
+const AIEditor = ({ open, onOpenChange, editor }: AIEditorProps) => {
+    const [loading, setLoading] = useState(false);
+    const [customPrompt, setCustomPrompt] = useState("");
+    const [aiResult, setAiResult] = useState("");
+    const [editMode, setEditMode] = useState(false);
+    const MAX_POLLING_TIME = 30000;
 
-//     const handleAIGenerate = async () => {
-//         if (!aiPrompt.trim()) return;
+    const waitForAiResult = async (runId: string) => {
+        const startTime = Date.now();
+        
+        while (Date.now() - startTime < MAX_POLLING_TIME) {
+            try {
+                const res = await fetch(`/api/ai-editor-result?runId=${runId}`);
+                
+                if (!res.ok) {
+                    console.error(`API error: ${res.status}`);
+                    await new Promise(res => setTimeout(res, 1000));
+                    continue;
+                }
 
-//         setLoading(true);
-//         setAiResult(null);
+                const data = await res.json();
+                
+                if (data.result) {
+                    setAiResult(data.result);
+                    return;
+                }
+                
+                if (data.status === "error") {
+                    setAiResult("❌ Lỗi xử lý. Vui lòng thử lại.");
+                    return;
+                }
 
-//         try {
-//             // fetch với absolute URL
-//             const res = await fetch(new URL("/api/ai-generate", window.location.origin).toString(), {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify({ prompt: aiPrompt, chatId: "demo", senderId: "user" }),
-//             });
+                await new Promise(res => setTimeout(res, 1000));
+            } catch (err) {
+                console.error("Polling error:", err);
+                await new Promise(res => setTimeout(res, 1000));
+            }
+        }
+        
+        setAiResult("⏱️ Hết thời gian chờ. Vui lòng thử lại.");
+    };
 
-//             // nếu server trả lỗi
-//             if (!res.ok) {
-//                 const text = await res.text();
-//                 console.error("Server trả lỗi:", text);
-//                 setAiResult("Có lỗi xảy ra khi tạo nội dung.");
-//                 return;
-//             }
+    const getSelectedText = () => {
+        if (!editor) return "";
+        const { from, to } = editor.state.selection;
+        return editor.state.doc.textBetween(from, to, " ").trim();
+    };
 
-//             // parse JSON
-//             const data = await res.json();
-//             const answer: string = data.answer ?? "Không có nội dung nào được tạo.";
-//             console.log("AI answer:", answer);
+    const sendAiRequest = async ({ action, customPrompt }: AiEditorAction) => {
+        const selectedText = getSelectedText();
+        
+        if (!selectedText) {
+            alert("Hãy bôi đen một đoạn văn bản trước khi dùng AI!");
+            return;
+        }
 
-//             // chèn vào editor
-//             const { editor } = useEditorStore.getState();
-//             if (editor) {
-//                 const paragraphs = answer
-//                     .split("\n")
-//                     .map((p) => `<p>${p}</p>`)
-//                     .join("");
-//                 editor.commands.insertContent(paragraphs);
-//                 editor.commands.focus();
-//             }
+        setLoading(true);
+        setAiResult("");
+        setEditMode(false);
 
-//             setAiResult(answer);
-//         } catch (err) {
-//             console.error("Lỗi khi gọi AI:", err);
-//             setAiResult("Có lỗi xảy ra khi tạo nội dung.");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
+        try {
+            const runId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-//     return (
-//         <Dialog open={open} onOpenChange={onOpenChange}>
-//             <DialogContent className="sm:max-w-[500px]">
-//                 <DialogHeader>
-//                     <DialogTitle>AI tạo nội dung</DialogTitle>
-//                 </DialogHeader>
+            const res = await fetch("/api/ai-editor", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    runId,
+                    selectedText, 
+                    action, 
+                    customPrompt: customPrompt || "" 
+                }),
+            });
 
-//                 <Input
-//                     placeholder="Nhập yêu cầu tạo nội dung..."
-//                     value={aiPrompt}
-//                     onChange={(e) => setAiPrompt(e.target.value)}
-//                     className="mb-2"
-//                 />
+            if (!res.ok) {
+                alert(`Lỗi: ${res.status}`);
+                setLoading(false);
+                return;
+            }
 
-//                 <div className="flex justify-end gap-2 mb-2">
-//                     <Button variant="outline" onClick={() => onOpenChange(false)}>
-//                         Hủy
-//                     </Button>
-//                     <Button
-//                         className="bg-blue-500 hover:bg-blue-600"
-//                         onClick={handleAIGenerate}
-//                         disabled={loading}
-//                     >
-//                         {loading ? "Đang tạo..." : "Tạo"}
-//                     </Button>
-//                 </div>
+            const data = await res.json();
+            
+            if (data.error) {
+                alert(`Lỗi: ${data.error}`);
+                setLoading(false);
+                return;
+            }
 
-//                 {aiResult && (
-//                     <div className="mt-2 p-2 border rounded bg-gray-50 text-sm whitespace-pre-wrap">
-//                         {aiResult}
-//                     </div>
-//                 )}
-//             </DialogContent>
-//         </Dialog>
-//     );
-// };
+            console.log("RunId gửi:", runId);
+
+            await waitForAiResult(runId);
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Không thể gọi AI. Vui lòng thử lại.");
+            setAiResult("");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const insertToEditor = () => {
+        if (!aiResult || aiResult.startsWith("❌") || aiResult.startsWith("⏱️")) {
+            alert("Không thể chèn lỗi. Vui lòng thử lại.");
+            return;
+        }
+        
+        if (!editor) {
+            alert("Trình biên tập chưa sẵn sàng. Vui lòng thử lại.");
+            return;
+        }
+
+        // Nếu dùng TipTap với Markdown extension
+        // editor sẽ tự động parse markdown
+        editor.chain().focus().insertContent(aiResult).run();
+        
+        // Nếu không có Markdown extension, convert markdown sang HTML
+        // const html = markdownToHtml(aiResult);
+        // editor.chain().focus().insertContent(html).run();
+        
+        setAiResult("");
+        onOpenChange(false);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Công cụ AI chỉnh sửa</DialogTitle>
+                </DialogHeader>
+
+                {/* DANH SÁCH CÁC NÚT TOOL */}
+                <div className="flex flex-col gap-2">
+                    <Button 
+                        disabled={loading} 
+                        variant="secondary"
+                        onClick={() => sendAiRequest({ action: "summarize" })}
+                    >
+                        {loading && <Loader2Icon className="animate-spin mr-2" size={16} />}
+                        Tóm tắt
+                    </Button>
+
+                    <Button 
+                        disabled={loading} 
+                        variant="secondary"
+                        onClick={() => sendAiRequest({ action: "rewrite" })}
+                    >
+                        {loading && <Loader2Icon className="animate-spin mr-2" size={16} />}
+                        Viết lại
+                    </Button>
+
+                    <Button 
+                        disabled={loading} 
+                        variant="secondary"
+                        onClick={() => sendAiRequest({ action: "generate" })}
+                    >
+                        {loading && <Loader2Icon className="animate-spin mr-2" size={16} />}
+                        Mở rộng nội dung
+                    </Button>
+
+                    {/* CUSTOM PROMPT */}
+                    <div className="mt-3 border-t pt-3">
+                        <input
+                            className="w-full px-3 py-2 rounded border text-sm"
+                            placeholder="Yêu cầu tùy chỉnh..."
+                            value={customPrompt}
+                            onChange={(e) => setCustomPrompt(e.target.value)}
+                            disabled={loading}
+                        />
+                        <Button
+                            disabled={loading || !customPrompt.trim()}
+                            className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white"
+                            onClick={() => sendAiRequest({ action: "custom", customPrompt })}
+                        >
+                            {loading && <Loader2Icon className="animate-spin mr-2" size={16} />}
+                            Gửi yêu cầu
+                        </Button>
+                    </div>
+                </div>
+
+                {aiResult && (
+                    <div className="mt-4 border-t pt-3">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-medium">Kết quả AI:</h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditMode(!editMode)}
+                                disabled={aiResult.startsWith("❌") || aiResult.startsWith("⏱️")}
+                            >
+                                {editMode ? "Xem" : "Sửa"}
+                            </Button>
+                        </div>
+
+                        {editMode ? (
+                            // Mode chỉnh sửa: textarea text thuần
+                            <textarea
+                                className="w-full h-40 px-3 py-2 border rounded text-sm font-mono"
+                                value={aiResult}
+                                onChange={(e) => setAiResult(e.target.value)}
+                                readOnly={aiResult.startsWith("❌") || aiResult.startsWith("⏱️")}
+                            />
+                        ) : (
+                            // Mode xem: render markdown
+                            <div className="w-full max-h-96 overflow-y-auto p-3 border rounded bg-gray-50">
+                                <ReactMarkdown
+                                    components={{
+                                        h1: ({children}) => <h1 className="text-2xl font-bold mt-4 mb-2">{children}</h1>,
+                                        h2: ({children}) => <h2 className="text-xl font-bold mt-3 mb-2">{children}</h2>,
+                                        h3: ({children}) => <h3 className="text-lg font-bold mt-2 mb-1">{children}</h3>,
+                                        p: ({children}) => <p className="mb-2 leading-relaxed">{children}</p>,
+                                        ul: ({children}) => <ul className="list-disc list-inside mb-2 ml-2">{children}</ul>,
+                                        ol: ({children}) => <ol className="list-decimal list-inside mb-2 ml-2">{children}</ol>,
+                                        li: ({children}) => <li className="mb-1">{children}</li>,
+                                        blockquote: ({children}) => (
+                                            <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2 text-gray-600">
+                                                {children}
+                                            </blockquote>
+                                        ),
+                                        code: ({children}) => (
+                                            <code className="bg-gray-200 px-1 py-0.5 rounded text-sm font-mono">
+                                                {children}
+                                            </code>
+                                        ),
+                                        a: ({href, children}) => <a href={href} className="text-blue-500 underline">{children}</a>,
+                                    }}
+                                >
+                                    {aiResult}
+                                </ReactMarkdown>
+                            </div>
+                        )}
+
+                        <div className="flex gap-2 mt-3">
+                            <Button 
+                                disabled={aiResult.startsWith("❌") || aiResult.startsWith("⏱️")}
+                                className="flex-1 bg-green-600 text-white hover:bg-green-700" 
+                                onClick={insertToEditor}
+                            >
+                                Chèn vào tài liệu
+                            </Button>
+                            <Button 
+                                disabled={loading || aiResult.startsWith("❌") || aiResult.startsWith("⏱️")}
+                                className="flex-1 bg-yellow-500 text-white hover:bg-yellow-600"
+                                onClick={() => sendAiRequest({ action: "custom", customPrompt: aiResult })}
+                            >
+                                Gửi lại
+                            </Button>
+                            <Button 
+                                className="flex-1 bg-red-500 text-white hover:bg-red-600"
+                                onClick={() => setAiResult("")}
+                            >
+                                Xóa
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Đóng</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 interface DrawingWindowProps {
     open: boolean;
@@ -964,6 +1142,7 @@ export const Toolbar = () => {
     const [youtubeOpen, setYoutubeOpen] = useState(false)
     const [mathOpen, setMathOpen] = useState(false)
     const [drawingOpen, setDrawingOpen] = useState(false)
+    const [aiOpen, setAiOpen] = useState(false);
     // const [aiGenerateOpen, setAiGenerateOpen] = useState(false);
 
     const addYoutubeVideo = (url: string, width: number, height: number) => {
@@ -1098,6 +1277,13 @@ export const Toolbar = () => {
                     icon: Mic,
                     onClick: startVoiceToText
                 },
+                {
+                    label: 'AI edior tools',
+                    icon: Bot,
+                    onClick: () => {
+                        setAiOpen(true)
+                    },
+                },
             ]
         ]
 
@@ -1158,6 +1344,12 @@ export const Toolbar = () => {
                 open={drawingOpen}
                 onClose={() => setDrawingOpen(false)}
                 onSubmit={addDrawing}
+            />
+
+            <AIEditor
+                open={aiOpen}
+                onOpenChange={setAiOpen}
+                editor={editor}
             />
         </div>
     )

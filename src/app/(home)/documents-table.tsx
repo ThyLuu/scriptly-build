@@ -12,9 +12,11 @@ interface DocumentsTableProps {
 }
 
 export const DocumentsTable = ({ documents, loadMore, status }: DocumentsTableProps) => {
+    const sortedDocuments = documents ? [...documents].reverse() : undefined
+
     return (
         <div className="max-w-screen-xl mx-auto px-16 py-6 flex flex-col gap-5">
-            {documents === undefined
+            {sortedDocuments === undefined
                 ? (
                     <div className="flex justify-center items-center h-24">
                         <LoaderIcon className="animate-spin text-muted-foreground size-5" />
@@ -31,7 +33,7 @@ export const DocumentsTable = ({ documents, loadMore, status }: DocumentsTablePr
                             </TableRow>
                         </TableHeader>
 
-                        {documents.length === 0
+                        {sortedDocuments.length === 0
                             ? (
                                 <TableBody>
                                     <TableRow className="hover:bg-transparent">
@@ -43,7 +45,7 @@ export const DocumentsTable = ({ documents, loadMore, status }: DocumentsTablePr
                             )
                             : (
                                 <TableBody>
-                                    {documents.map((document) => (
+                                    {sortedDocuments.map((document) => (
                                         <DocumentRow key={document._id} document={document} />
                                     ))}
                                 </TableBody>

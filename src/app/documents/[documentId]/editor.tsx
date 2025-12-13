@@ -40,6 +40,7 @@ import 'katex/dist/katex.min.css'
 import type { Editor as TiptapEditor } from "@tiptap/react";
 import Heading from '@tiptap/extension-heading'
 // import { Dropcursor } from '@tiptap/extensions'
+import { Markdown } from 'tiptap-markdown';
 
 const lowlight = createLowlight(all)
 
@@ -103,6 +104,11 @@ export const Editor = ({ initialContent, onTocUpdate, onEditorCreate }: EditorPr
             //     color: '#3B82F6',
             //     width: 2
             // }),
+            Markdown.configure({
+                html: true,
+                transformPastedText: false,
+                transformCopiedText: false,
+            }),
             TableOfContents.configure({
                 getIndex: getHierarchicalIndexes,
                 onUpdate(content) {

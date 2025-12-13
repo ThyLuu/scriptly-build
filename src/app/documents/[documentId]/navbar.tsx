@@ -8,7 +8,7 @@ import { BoldIcon, FileIcon, FileJsonIcon, FilePenIcon, FilePlusIcon, FileTextIc
 import { BsFilePdf } from "react-icons/bs";
 import { useEditorStore } from "@/store/use-editor-store";
 import { TablePicker } from "./tablePicker";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher, UserButton, useUser } from "@clerk/nextjs";
 import { Avatars } from "./avatar";
 import { Inbox } from "./inbox";
 import { Doc } from "../../../../convex/_generated/dataModel";
@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { RenameDialog } from "@/components/rename-dialog";
 import { RemoveDialog } from "@/components/remove-dialog";
 import Meeting from "./meeting";
+import DocumentHistory from "./version-history";
 
 interface NavbarProps {
     data: Doc<'documents'>
@@ -30,6 +31,11 @@ export const Navbar = ({ data }: NavbarProps) => {
     const { editor } = useEditorStore()
 
     const mutation = useMutation(api.documents.create)
+
+    const {user} = useUser()
+    const roomId = data.roomId || `doc-${data._id}`
+    const userId = user?.id || ""
+    const userName = user?.fullName || "Anonymous"
 
     const onNewDocument = () => {
         mutation({
@@ -300,6 +306,13 @@ export const Navbar = ({ data }: NavbarProps) => {
                 <Inbox />
 
                 <Meeting documentId={data._id}/>
+
+                <DocumentHistory
+                    documentId={data._id}
+                    roomId={roomId}
+                    userId={userId}
+                    userName={userName}
+                />
 
                 <OrganizationSwitcher
                     afterCreateOrganizationUrl={'/'}

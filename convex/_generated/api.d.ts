@@ -13,8 +13,10 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as aiEditor from "../aiEditor.js";
 import type * as chats from "../chats.js";
 import type * as documents from "../documents.js";
+import type * as documentVersions from "../documentVersions.js";
 import type * as files from "../files.js";
 import type * as messages from "../messages.js";
 import type * as users from "../users.js";
@@ -28,8 +30,10 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  aiEditor: typeof aiEditor;
   chats: typeof chats;
   documents: typeof documents;
+  documentVersions: typeof documentVersions;
   files: typeof files;
   messages: typeof messages;
   users: typeof users;

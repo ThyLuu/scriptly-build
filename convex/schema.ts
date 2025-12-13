@@ -47,4 +47,34 @@ export default defineSchema({
     })
         .index("by_document_id", ["documentId"])
         .index("by_uploaded_by", ["uploadedBy"]),
+
+    aiEditor: defineTable({
+        runId: v.string(),
+        ownerId: v.string(),
+        selectedText: v.string(),
+        action: v.string(),            // summarize | rewrite | generate | custom
+        customPrompt: v.optional(v.string()),
+        status: v.union(
+            v.literal("pending"),
+            v.literal("done"),
+            v.literal("error")
+        ),
+        result: v.optional(v.string()),
+    })
+        .index("by_runId", ["runId"])
+        .index("by_ownerId", ["ownerId"]),
+
+    documentVersions: defineTable({
+        documentId: v.id("documents"),
+        roomId: v.string(),
+        versionId: v.string(), 
+        content: v.string(), 
+        snapshot: v.any(), 
+        createdBy: v.string(), 
+        createdByName: v.optional(v.string()),
+        description: v.optional(v.string()), 
+    })
+        .index("by_document_id", ["documentId"])
+        .index("by_room_id", ["roomId"])
+        .index("by_version_id", ["versionId"]),
 })

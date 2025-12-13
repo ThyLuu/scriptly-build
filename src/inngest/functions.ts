@@ -14,6 +14,7 @@ export const helloWorld = inngest.createFunction(
 // Chuẩn hóa input từ user trước khi gửi cho AI.
 // Loại bỏ khoảng trắng thừa, gộp nhiều khoảng trắng liên tiếp thành 1 khoảng trắng duy nhất.
 // trim() → xóa khoảng trắng đầu và cuối message
+// đây là phần NPL cơ bản để làm sạch dữ liệu đầu vào
 function preprocessMessage(message: string) {
     return message.trim().replace(/\s+/g, " ");
 }
@@ -169,80 +170,103 @@ export const aiChat = inngest.createFunction(
 //     }
 // )
 
-// export const aiGenerate = inngest.createFunction(
-//     { id: "ai-generate" },
-//     { event: "ai-generate" },
-//     async ({ event, step }) => {
-//         const userPrompt = event.data.prompt;
-//         const chatId = event.data.chatId;
-//         const senderId = event.data.senderId;
+export const aiEditorTools = inngest.createFunction(
+    { id: "ai-editor-tools" },
+    { event: "ai/editor" },
+    async ({ event, step }) => {
+        const { selectedText, action, customPrompt, runId } = event.data;
 
-//         // Gọi Gemini
-//         const aiResp = await step.ai.infer("ai-generate-call", {
-//             model: step.ai.models.gemini({
-//                 model: "gemini-2.5-flash",
-//                 apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
-//             }),
-//             body: {
-//                 contents: [
-//                     {
-//                         role: 'model',
-//                         parts: [
-//                             {
-//                                 text: 'Bạn là một AI tạo nội dung. Viết nội dung sáng tạo, chi tiết, rõ ràng dựa trên yêu cầu của người dùng,',
-//                             }
-//                         ]
-//                     },
-//                     {
-//                         role: "user",
-//                         parts: [{ text: userPrompt }],
-//                     },
-//                 ],
-//             },
-//         });
+        // Làm sạch input
+        const cleanText = preprocessMessage(selectedText);
+        if (!cleanText || cleanText.length === 0) {
+            await fetchMutation(api.aiEditor.setAiResult, {
+                runId,
+                result: "Không tìm thấy nội dung nào để xử lý.",
+            });
+            return { result: "Không tìm thấy nội dung nào để xử lý." };
+        }
 
-//         const aiText = aiResp?.candidates?.[0]?.content?.parts?.[0] && "text" in aiResp.candidates[0].content.parts[0]
-//             ? aiResp.candidates[0].content.parts[0].text
-//             : "Xin lỗi, hãy thử lại sau.";
+        // Build prompt theo action
+        let prompt = "";
+        switch (action) {
+            case "summarize":
+                prompt = `Tóm tắt đoạn văn sau thật ngắn gọn và tự nhiên:\n\n${cleanText}`;
+                break;
+            case "rewrite":
+                prompt = `Viết lại đoạn văn sau theo cách rõ ràng, mượt và tự nhiên:\n\n${cleanText}`;
+                break;
+            case "generate":
+                prompt = `Dựa trên nội dung sau, hãy tạo thêm ý tưởng hoặc mở rộng nội dung:\n\n${cleanText}`;
+                break;
+            case "custom":
+                prompt = `${customPrompt}\n\nNội dung:\n${cleanText}`;
+                break;
+            default:
+                await fetchMutation(api.aiEditor.setAiResult, {
+                    runId,
+                    result: "Action không hợp lệ.",
+                });
+                return { result: "Action không hợp lệ." };
+        }
 
-//         // Lưu message AI vào Convex
-//         // await fetchMutation(api.messages.sendMessage, {
-//         //     chatId,
-//         //     senderId: "ai", // hoặc "system"
-//         //     role: "ai",
-//         //     content: aiText,
-//         // })
+        // Body gửi Gemini
+        const body = {
+            model: step.ai.models.gemini({
+                model: "gemini-2.5-flash",
+                apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
+            }),
+            body: {
+                contents: [
+                    {
+                        role: "model",
+                        parts: [
+                            { text: "Bạn là AI chuyên xử lý văn bản. Hãy trả lời đúng yêu cầu." }
+                        ]
+                    },
+                    {
+                        role: "user",
+                        parts: [{ text: prompt }],
+                    },
+                ],
+            },
+        };
 
-//         return { answer: aiText }
-//     }
-// )
+        try {
+            // Gọi AI + retry
+            const aiResp = await callGeminiWithRetry(step, body);
+            const candidates = (aiResp?.candidates ?? []) as GeminiCandidate[];
+            let result = "Không thể tạo kết quả.";
 
-// export const aiGenerate = inngest.createFunction(
-//     { id: "ai-generate" },
-//     { event: "ai-generate" },
-//     async ({ event, step }) => {
-//         const userPrompt = event.data.prompt;
+            if (candidates.length > 0) {
+                result = candidates.reduce((prev: string, cur: GeminiCandidate) => {
+                    const text = cur.content.parts[0]?.text ?? "";
+                    return text.length > prev.length ? text : prev;
+                }, "");
+            }
 
-//         const aiResp = await step.ai.infer("ai-generate-call", {
-//             model: step.ai.models.gemini({ model: "gemini-2.5-flash", apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! }),
-//             body: {
-//                 contents: [
-//                     { role: "model", parts: [{ text: "Bạn là AI..." }] },
-//                     { role: "user", parts: [{ text: userPrompt }] }
-//                 ]
-//             }
-//         });
+            // Filter nội dung không phù hợp
+            result = filterToxic(result);
 
-//         const firstPart = aiResp?.candidates?.[0]?.content?.parts?.[0];
+            // LƯU KẾT QUẢ VÀO CONVEX
+            await fetchMutation(api.aiEditor.setAiResult, {
+                runId,
+                result,
+            });
 
-//         let aiText = "Xin lỗi, hãy thử lại sau.";
+            console.log(`✅ AI Editor completed: runId=${runId}, resultLength=${result.length}`);
+            return { answer: result };
 
-//         if (firstPart && "text" in firstPart) {
-//             aiText = firstPart.text;
-//         }
+        } catch (error) {
+            console.error(`❌ AI Editor failed: runId=${runId}`, error);
 
-//         console.log("AI Text:", aiText);
+            // Lưu error status vào DB nếu cần
+            const errorMsg = error instanceof Error ? error.message : "Lỗi xử lý";
+            await fetchMutation(api.aiEditor.setAiResult, {
+                runId,
+                result: `Lỗi: ${errorMsg}`,
+            });
 
-//         return { answer: aiText };
-//     }
-// );
+            throw error;
+        }
+    }
+);
