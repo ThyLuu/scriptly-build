@@ -45,7 +45,11 @@ export const Document = ({ preloadedDocument }: DocumentProps) => {
                 </div> */}
 
                 <div className="pt-[114px] flex relative print:top-0">
-                    <TableOfContent editor={editor} items={tocItems} onTocUpdate={setTocItems}/>
+                    <div className="hidden lg:block">
+                        <TableOfContent editor={editor} items={tocItems} onTocUpdate={setTocItems} />
+                    </div>
+
+
                     <div className="flex-1 flex justify-center px-4">
                         <Editor initialContent={document.initialContent} onTocUpdate={setTocItems} onEditorCreate={setEditor} />
                     </div>
