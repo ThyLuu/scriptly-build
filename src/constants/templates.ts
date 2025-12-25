@@ -606,272 +606,272 @@ export const templates = [
     label: 'Báo cáo',
     imageUrl: '/report.png',
     initialContent: `
-          <h1>BÁO CÁO</h1>
-          <p><em>Tiêu đề báo cáo (sửa lại)</em></p>
-          <hr />
-          <p><strong>Ngày:</strong> …/…/……</p>
-          <p><strong>Tác giả:</strong> Tên người lập</p>
-          <p><strong>Đơn vị:</strong> Tên phòng ban / công ty</p>
+<h1>BÁO CÁO</h1>
+<p><em>Tiêu đề báo cáo (sửa lại)</em></p>
+<hr />
+<p><strong>Ngày:</strong> …/…/……</p>
+<p><strong>Tác giả:</strong> Tên người lập</p>
+<p><strong>Đơn vị:</strong> Tên phòng ban / công ty</p>
 
-          <h2>I. Tóm tắt điều hành</h2>
-          <p>
-          Đoạn tóm tắt ngắn gọn (5–7 câu) về mục tiêu, phương pháp,
-          phát hiện chính và kiến nghị trọng tâm.
-          </p>
+<h2>I. Tóm tắt điều hành</h2>
+<p>
+Đoạn tóm tắt ngắn gọn (5–7 câu) về mục tiêu, phương pháp,
+phát hiện chính và kiến nghị trọng tâm.
+</p>
 
-          <h2>II. Mục lục</h2>
-          <ol>
-            <li>Tóm tắt điều hành</li>
-            <li>Mục tiêu & Phạm vi</li>
-            <li>Phương pháp</li>
-            <li>Kết quả & Phân tích</li>
-            <li>Bảng & Số liệu</li>
-            <li>Kết luận</li>
-            <li>Kiến nghị</li>
-            <li>Phụ lục</li>
-          </ol>
+<h2>II. Mục lục</h2>
+<ol>
+  <li>Tóm tắt điều hành</li>
+  <li>Mục tiêu & Phạm vi</li>
+  <li>Phương pháp</li>
+  <li>Kết quả & Phân tích</li>
+  <li>Bảng & Số liệu</li>
+  <li>Kết luận</li>
+  <li>Kiến nghị</li>
+  <li>Phụ lục</li>
+</ol>
 
-          <h2>III. Mục tiêu & Phạm vi</h2>
-          <ul>
-            <li><strong>Mục tiêu 1:</strong> …</li>
-            <li><strong>Mục tiêu 2:</strong> …</li>
-            <li><strong>Phạm vi:</strong> thời gian, khu vực, nhóm dữ liệu…</li>
-            <li><strong>Giới hạn:</strong> giả định, ràng buộc, thiếu dữ liệu…</li>
-          </ul>
+<h2>III. Mục tiêu & Phạm vi</h2>
+<ul>
+  <li><strong>Mục tiêu 1:</strong> …</li>
+  <li><strong>Mục tiêu 2:</strong> …</li>
+  <li><strong>Phạm vi:</strong> thời gian, khu vực, nhóm dữ liệu…</li>
+  <li><strong>Giới hạn:</strong> giả định, ràng buộc, thiếu dữ liệu…</li>
+</ul>
 
-          <h2>IV. Phương pháp</h2>
-          <p>Mô tả cách tiếp cận, nguồn dữ liệu, công cụ, tiêu chí đánh giá.</p>
-          <ul>
-            <li><strong>Nguồn dữ liệu:</strong> nội bộ / ngoại bộ</li>
-            <li><strong>Công cụ:</strong> Excel, SQL, Python, BI</li>
-            <li><strong>Quy trình:</strong> thu thập → làm sạch → phân tích</li>
-          </ul>
-          <blockquote>Ghi chú: Nêu rõ các giả định quan trọng.</blockquote>
+<h2>IV. Phương pháp</h2>
+<p>Mô tả cách tiếp cận, nguồn dữ liệu, công cụ, tiêu chí đánh giá.</p>
+<ul>
+  <li><strong>Nguồn dữ liệu:</strong> nội bộ / ngoại bộ</li>
+  <li><strong>Công cụ:</strong> Excel, SQL, Python, BI</li>
+  <li><strong>Quy trình:</strong> thu thập → làm sạch → phân tích</li>
+</ul>
+<blockquote>Ghi chú: Nêu rõ các giả định quan trọng.</blockquote>
 
-          <h2>V. Kết quả & Phân tích</h2>
-          <h3>1. Phát hiện chính</h3>
-          <ul>
-            <li>Insight 1 — tác động.</li>
-            <li>Insight 2 — tác động.</li>
-            <li>Insight 3 — tác động.</li>
-          </ul>
+<h2>V. Kết quả & Phân tích</h2>
+<h3>1. Phát hiện chính</h3>
+<ul>
+  <li>Insight 1 — tác động.</li>
+  <li>Insight 2 — tác động.</li>
+  <li>Insight 3 — tác động.</li>
+</ul>
 
-          <h3>2. Trực quan</h3>
-          <p><em>(Chèn biểu đồ / hình ảnh tại đây)</em></p>
+<h3>2. Trực quan</h3>
+<p><em>(Chèn biểu đồ / hình ảnh tại đây)</em></p>
 
-          <h2>VI. Bảng & Số liệu</h2>
-          <table>
-            <tr>
-              <th>Chỉ tiêu</th>
-              <th>Kỳ trước</th>
-              <th>Kỳ này</th>
-              <th>% thay đổi</th>
-            </tr>
-            <tr>
-              <td>Doanh thu</td>
-              <td>100</td>
-              <td>120</td>
-              <td>+20%</td>
-            </tr>
-            <tr>
-              <td>Chi phí</td>
-              <td>60</td>
-              <td>66</td>
-              <td>+10%</td>
-            </tr>
-            <tr>
-              <td>Lợi nhuận</td>
-              <td>40</td>
-              <td>54</td>
-              <td>+35%</td>
-            </tr>
-          </table>
+<h2>VI. Bảng & Số liệu</h2>
+<table>
+  <tr>
+    <th>Chỉ tiêu</th>
+    <th>Kỳ trước</th>
+    <th>Kỳ này</th>
+    <th>% thay đổi</th>
+  </tr>
+  <tr>
+    <td>Doanh thu</td>
+    <td>100</td>
+    <td>120</td>
+    <td>+20%</td>
+  </tr>
+  <tr>
+    <td>Chi phí</td>
+    <td>60</td>
+    <td>66</td>
+    <td>+10%</td>
+  </tr>
+  <tr>
+    <td>Lợi nhuận</td>
+    <td>40</td>
+    <td>54</td>
+    <td>+35%</td>
+  </tr>
+</table>
 
-          <h2>VII. Kết luận</h2>
-          <p>Tóm tắt các điểm chính rút ra.</p>
+<h2>VII. Kết luận</h2>
+<p>Tóm tắt các điểm chính rút ra.</p>
 
-          <h2>VIII. Kiến nghị</h2>
-          <ol>
-            <li>Hành động 1 — ưu tiên cao</li>
-            <li>Hành động 2 — thời gian & rủi ro</li>
-            <li>Hành động 3 — KPI</li>
-          </ol>
+<h2>VIII. Kiến nghị</h2>
+<ol>
+  <li>Hành động 1 — ưu tiên cao</li>
+  <li>Hành động 2 — thời gian & rủi ro</li>
+  <li>Hành động 3 — KPI</li>
+</ol>
 
-          <h2>IX. Phụ lục</h2>
-          <ul>
-            <li>Định nghĩa thuật ngữ</li>
-            <li>Ghi chú phương pháp</li>
-            <li>Tài liệu tham khảo</li>
-          </ul>
+<h2>IX. Phụ lục</h2>
+<ul>
+  <li>Định nghĩa thuật ngữ</li>
+  <li>Ghi chú phương pháp</li>
+  <li>Tài liệu tham khảo</li>
+</ul>
 
-          <hr />
-          <p><strong>Người lập:</strong> ………………… | <strong>Ngày:</strong> …/…/……</p>
-          <p><strong>Phê duyệt:</strong> ………………… | <strong>Ngày:</strong> …/…/……</p>
-          `,
+<hr />
+<p><strong>Người lập:</strong> ………………… | <strong>Ngày:</strong> …/…/……</p>
+<p><strong>Phê duyệt:</strong> ………………… | <strong>Ngày:</strong> …/…/……</p>
+`,
   },
   {
     id: 'project-proposal',
     label: 'Đề xuất dự án',
     imageUrl: '/project-proposal.png',
     initialContent: `
-      <h1>ĐỀ XUẤT DỰ ÁN</h1>
-      <p><strong>Tên dự án:</strong> ................................................</p>
-      <p><strong>Ngày:</strong> …/…/……</p>
-      <p><strong>Người đề xuất:</strong> ................................................</p>
-      <p><strong>Đơn vị:</strong> ................................................</p>
-      <hr />
+<h1>ĐỀ XUẤT DỰ ÁN</h1>
+<p><strong>Tên dự án:</strong> ................................................</p>
+<p><strong>Ngày:</strong> …/…/……</p>
+<p><strong>Người đề xuất:</strong> ................................................</p>
+<p><strong>Đơn vị:</strong> ................................................</p>
+<hr />
 
-      <h2>I. Tóm tắt dự án</h2>
-      <p>
-        Mô tả ngắn gọn lý do hình thành dự án, vấn đề cần giải quyết hoặc cơ hội cần nắm bắt,
-        cùng với kết quả mong đợi. Phần này nên súc tích để người phê duyệt nhanh chóng nắm được nội dung.
-      </p>
+<h2>I. Tóm tắt dự án</h2>
+<p>
+Mô tả ngắn gọn lý do hình thành dự án, vấn đề cần giải quyết hoặc cơ hội cần nắm bắt,
+cùng với kết quả mong đợi. Phần này nên súc tích để người phê duyệt nhanh chóng nắm được nội dung.
+</p>
 
-      <h2>II. Mục tiêu</h2>
-      <ul>
-        <li><strong>Mục tiêu 1:</strong> ................................................</li>
-        <li><strong>Mục tiêu 2:</strong> ................................................</li>
-        <li><strong>Chỉ số thành công (KPI):</strong> ................................................</li>
-      </ul>
+<h2>II. Mục tiêu</h2>
+<ul>
+  <li><strong>Mục tiêu 1:</strong> ................................................</li>
+  <li><strong>Mục tiêu 2:</strong> ................................................</li>
+  <li><strong>Chỉ số thành công (KPI):</strong> ................................................</li>
+</ul>
 
-      <h2>III. Phạm vi & Đối tượng</h2>
-      <ul>
-        <li><strong>Phạm vi công việc:</strong> ................................................</li>
-        <li><strong>Ngoài phạm vi:</strong> ................................................</li>
-        <li><strong>Đối tượng thụ hưởng:</strong> ................................................</li>
-      </ul>
+<h2>III. Phạm vi & Đối tượng</h2>
+<ul>
+  <li><strong>Phạm vi công việc:</strong> ................................................</li>
+  <li><strong>Ngoài phạm vi:</strong> ................................................</li>
+  <li><strong>Đối tượng thụ hưởng:</strong> ................................................</li>
+</ul>
 
-      <h2>IV. Giải pháp đề xuất</h2>
-      <p>
-        Mô tả phương án kỹ thuật, công nghệ hoặc quy trình dự kiến áp dụng để đạt được mục tiêu dự án.
-      </p>
-      <p><em>(Chèn sơ đồ, wireframe hoặc hình minh họa tại đây)</em></p>
+<h2>IV. Giải pháp đề xuất</h2>
+<p>
+Mô tả phương án kỹ thuật, công nghệ hoặc quy trình dự kiến áp dụng để đạt được mục tiêu dự án.
+</p>
+<p><em>(Chèn sơ đồ, wireframe hoặc hình minh họa tại đây)</em></p>
 
-      <h2>V. Thời gian thực hiện (Timeline)</h2>
-      <table>
-        <tr>
-          <th>Giai đoạn</th>
-          <th>Nội dung công việc</th>
-          <th>Thời gian</th>
-          <th>Người phụ trách</th>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>Khởi động & phân tích yêu cầu</td>
-          <td>Tuần 1 – 2</td>
-          <td>PM</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Thiết kế & phê duyệt</td>
-          <td>Tuần 3 – 4</td>
-          <td>Thiết kế</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Phát triển & kiểm thử</td>
-          <td>Tuần 5 – 10</td>
-          <td>Dev team</td>
-        </tr>
-      </table>
+<h2>V. Thời gian thực hiện (Timeline)</h2>
+<table>
+  <tr>
+    <th>Giai đoạn</th>
+    <th>Nội dung công việc</th>
+    <th>Thời gian</th>
+    <th>Người phụ trách</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Khởi động & phân tích yêu cầu</td>
+    <td>Tuần 1 – 2</td>
+    <td>PM</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Thiết kế & phê duyệt</td>
+    <td>Tuần 3 – 4</td>
+    <td>Thiết kế</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Phát triển & kiểm thử</td>
+    <td>Tuần 5 – 10</td>
+    <td>Dev team</td>
+  </tr>
+</table>
 
-      <h2>VI. Ngân sách dự kiến</h2>
-      <table>
-        <tr>
-          <th>Hạng mục</th>
-          <th>Chi phí (VNĐ)</th>
-        </tr>
-        <tr>
-          <td>Nhân sự</td>
-          <td>...</td>
-        </tr>
-        <tr>
-          <td>Công cụ / phần mềm</td>
-          <td>...</td>
-        </tr>
-        <tr>
-          <td>Khác</td>
-          <td>...</td>
-        </tr>
-        <tr>
-          <td><strong>Tổng cộng</strong></td>
-          <td><strong>...</strong></td>
-        </tr>
-      </table>
+<h2>VI. Ngân sách dự kiến</h2>
+<table>
+  <tr>
+    <th>Hạng mục</th>
+    <th>Chi phí (VNĐ)</th>
+  </tr>
+  <tr>
+    <td>Nhân sự</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>Công cụ / phần mềm</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td>Khác</td>
+    <td>...</td>
+  </tr>
+  <tr>
+    <td><strong>Tổng cộng</strong></td>
+    <td><strong>...</strong></td>
+  </tr>
+</table>
 
-      <h2>VII. Rủi ro & Giải pháp</h2>
-      <ul>
-        <li><strong>Rủi ro 1:</strong> ................................ → <em>Giải pháp:</em> ................................</li>
-        <li><strong>Rủi ro 2:</strong> ................................ → <em>Giải pháp:</em> ................................</li>
-      </ul>
+<h2>VII. Rủi ro & Giải pháp</h2>
+<ul>
+  <li><strong>Rủi ro 1:</strong> ................................ → <em>Giải pháp:</em> ................................</li>
+  <li><strong>Rủi ro 2:</strong> ................................ → <em>Giải pháp:</em> ................................</li>
+</ul>
 
-      <h2>VIII. Kết luận & Kiến nghị</h2>
-      <p>
-        Tổng kết giá trị dự án mang lại cho tổ chức, lý do nên phê duyệt
-        và đề xuất các bước triển khai tiếp theo.
-      </p>
+<h2>VIII. Kết luận & Kiến nghị</h2>
+<p>
+Tổng kết giá trị dự án mang lại cho tổ chức, lý do nên phê duyệt
+và đề xuất các bước triển khai tiếp theo.
+</p>
 
-      <hr />
-      <p><strong>Người đề xuất:</strong> ................................................</p>
-      <p><strong>Người phê duyệt:</strong> ................................................</p>
-    `,
+<hr />
+<p><strong>Người đề xuất:</strong> ................................................</p>
+<p><strong>Người phê duyệt:</strong> ................................................</p>
+`,
   },
   {
     id: 'business-letter',
     label: 'Thư doanh nghiệp',
     imageUrl: '/business-letter.png',
     initialContent: `
-      <h1>THƯ DOANH NGHIỆP</h1>
-      <p><em>(Sửa lại tiêu đề nếu cần)</em></p>
-      <hr />
+<h1>THƯ DOANH NGHIỆP</h1>
+<p><em>(Sửa lại tiêu đề nếu cần)</em></p>
+<hr />
 
-      <p><strong>Công ty:</strong> ........................................</p>
-      <p><strong>Địa chỉ:</strong> ........................................</p>
-      <p><strong>Điện thoại:</strong> ....................................</p>
-      <p><strong>Email:</strong> ........................................</p>
+<p><strong>Công ty:</strong> ........................................</p>
+<p><strong>Địa chỉ:</strong> ........................................</p>
+<p><strong>Điện thoại:</strong> ....................................</p>
+<p><strong>Email:</strong> ........................................</p>
 
-      <p><em>Hà Nội, ngày … tháng … năm …</em></p>
+<p><em>Hà Nội, ngày … tháng … năm …</em></p>
 
-      <h2>I. Thông tin người nhận</h2>
-      <ul>
-        <li><strong>Kính gửi:</strong> Ông/Bà ........................................</li>
-        <li><strong>Chức vụ:</strong> ........................................</li>
-        <li><strong>Công ty:</strong> ........................................</li>
-      </ul>
+<h2>I. Thông tin người nhận</h2>
+<ul>
+  <li><strong>Kính gửi:</strong> Ông/Bà ........................................</li>
+  <li><strong>Chức vụ:</strong> ........................................</li>
+  <li><strong>Công ty:</strong> ........................................</li>
+</ul>
 
-      <h2>II. Nội dung thư</h2>
-      <p>Kính thưa Quý Ông/Bà,</p>
+<h2>II. Nội dung thư</h2>
+<p>Kính thưa Quý Ông/Bà,</p>
 
-      <p>
-        Trước tiên, Công ty chúng tôi xin gửi tới Quý Ông/Bà lời chào trân trọng
-        và lời chúc sức khỏe, thành công.
-      </p>
+<p>
+Trước tiên, Công ty chúng tôi xin gửi tới Quý Ông/Bà lời chào trân trọng
+và lời chúc sức khỏe, thành công.
+</p>
 
-      <p>
-        Nội dung chính của thư:
-      </p>
-      <ul>
-        <li>Vấn đề / đề xuất 1</li>
-        <li>Vấn đề / đề xuất 2</li>
-        <li>Vấn đề / đề xuất 3</li>
-      </ul>
+<p>
+Nội dung chính của thư:
+</p>
+<ul>
+  <li>Vấn đề / đề xuất 1</li>
+  <li>Vấn đề / đề xuất 2</li>
+  <li>Vấn đề / đề xuất 3</li>
+</ul>
 
-      <p>
-        Chúng tôi rất mong nhận được sự quan tâm và phản hồi từ Quý Ông/Bà,
-        đồng thời hy vọng có cơ hội hợp tác lâu dài trong thời gian tới.
-      </p>
+<p>
+Chúng tôi rất mong nhận được sự quan tâm và phản hồi từ Quý Ông/Bà,
+đồng thời hy vọng có cơ hội hợp tác lâu dài trong thời gian tới.
+</p>
 
-      <h2>III. Kết thư</h2>
-      <p>Trân trọng,</p>
+<h2>III. Kết thư</h2>
+<p>Trân trọng,</p>
 
-      <p><strong>ĐẠI DIỆN CÔNG TY</strong></p>
-      <p>(Ký tên, ghi rõ họ tên & đóng dấu)</p>
+<p><strong>ĐẠI DIỆN CÔNG TY</strong></p>
+<p>(Ký tên, ghi rõ họ tên & đóng dấu)</p>
 
-      <hr />
+<hr />
 
-      <p><strong>Người liên hệ:</strong> ........................................</p>
-      <p><strong>Website:</strong> ........................................</p>
-    `,
+<p><strong>Người liên hệ:</strong> ........................................</p>
+<p><strong>Website:</strong> ........................................</p>
+`,
   },
   {
     id: 'resume',
@@ -954,115 +954,115 @@ export const templates = [
     label: 'Tập quảng cáo',
     imageUrl: '/brochure.png',
     initialContent: `
-      <h1>TẬP QUẢNG CÁO</h1>
-      <p><em>(Brochure / Company Profile)</em></p>
-      <hr />
+<h1>TẬP QUẢNG CÁO</h1>
+<p><em>(Brochure / Company Profile)</em></p>
+<hr />
 
-      <p><strong>Tên công ty / Thương hiệu:</strong> ........................................</p>
-      <p><strong>Slogan / Thông điệp:</strong> ........................................</p>
+<p><strong>Tên công ty / Thương hiệu:</strong> ........................................</p>
+<p><strong>Slogan / Thông điệp:</strong> ........................................</p>
 
-      <p><em>(Chèn hình ảnh bìa tại đây)</em></p>
+<p><em>(Chèn hình ảnh bìa tại đây)</em></p>
 
-      <h2>I. Giới thiệu</h2>
-      <p>
-        Chúng tôi là .............................................................,
-        chuyên cung cấp các sản phẩm / dịch vụ trong lĩnh vực ........................................
-      </p>
-      <p>
-        Với đội ngũ giàu kinh nghiệm và tinh thần đổi mới, chúng tôi cam kết
-        mang đến cho khách hàng những giải pháp chất lượng, hiệu quả và bền vững.
-      </p>
+<h2>I. Giới thiệu</h2>
+<p>
+Chúng tôi là .............................................................,
+chuyên cung cấp các sản phẩm / dịch vụ trong lĩnh vực ........................................
+</p>
+<p>
+Với đội ngũ giàu kinh nghiệm và tinh thần đổi mới, chúng tôi cam kết
+mang đến cho khách hàng những giải pháp chất lượng, hiệu quả và bền vững.
+</p>
 
-      <h2>II. Sản phẩm & Dịch vụ nổi bật</h2>
+<h2>II. Sản phẩm & Dịch vụ nổi bật</h2>
 
-      <h3>1. Sản phẩm / Dịch vụ 1</h3>
-      <p><em>(Chèn hình ảnh sản phẩm / dịch vụ)</em></p>
-      <ul>
-        <li>Mô tả ngắn gọn về sản phẩm / dịch vụ</li>
-        <li>Lợi ích chính mang lại cho khách hàng</li>
-        <li>Điểm khác biệt nổi bật</li>
-      </ul>
+<h3>1. Sản phẩm / Dịch vụ 1</h3>
+<p><em>(Chèn hình ảnh sản phẩm / dịch vụ)</em></p>
+<ul>
+  <li>Mô tả ngắn gọn về sản phẩm / dịch vụ</li>
+  <li>Lợi ích chính mang lại cho khách hàng</li>
+  <li>Điểm khác biệt nổi bật</li>
+</ul>
 
-      <h3>2. Sản phẩm / Dịch vụ 2</h3>
-      <p><em>(Chèn hình ảnh sản phẩm / dịch vụ)</em></p>
-      <ul>
-        <li>Mô tả ngắn gọn về sản phẩm / dịch vụ</li>
-        <li>Lợi ích chính mang lại cho khách hàng</li>
-        <li>Điểm khác biệt nổi bật</li>
-      </ul>
+<h3>2. Sản phẩm / Dịch vụ 2</h3>
+<p><em>(Chèn hình ảnh sản phẩm / dịch vụ)</em></p>
+<ul>
+  <li>Mô tả ngắn gọn về sản phẩm / dịch vụ</li>
+  <li>Lợi ích chính mang lại cho khách hàng</li>
+  <li>Điểm khác biệt nổi bật</li>
+</ul>
 
-      <h2>III. Giá trị mang lại</h2>
-      <ul>
-        <li>Chất lượng & uy tín</li>
-        <li>Dịch vụ khách hàng tận tâm</li>
-        <li>Giải pháp linh hoạt, phù hợp nhu cầu</li>
-      </ul>
+<h2>III. Giá trị mang lại</h2>
+<ul>
+  <li>Chất lượng & uy tín</li>
+  <li>Dịch vụ khách hàng tận tâm</li>
+  <li>Giải pháp linh hoạt, phù hợp nhu cầu</li>
+</ul>
 
-      <h2>IV. Ưu đãi & Chương trình khuyến mãi</h2>
-      <p>
-        <strong>Ưu đãi đặc biệt:</strong> ........................................
-      </p>
-      <p>
-        Áp dụng cho: khách hàng mới / thời gian giới hạn / số lượng có hạn.
-      </p>
+<h2>IV. Ưu đãi & Chương trình khuyến mãi</h2>
+<p>
+<strong>Ưu đãi đặc biệt:</strong> ........................................
+</p>
+<p>
+Áp dụng cho: khách hàng mới / thời gian giới hạn / số lượng có hạn.
+</p>
 
-      <h2>V. Thông tin liên hệ</h2>
-      <ul>
-        <li><strong>Địa chỉ:</strong> ........................................</li>
-        <li><strong>Điện thoại:</strong> ........................................</li>
-        <li><strong>Email:</strong> ........................................</li>
-        <li><strong>Website:</strong> ........................................</li>
-      </ul>
+<h2>V. Thông tin liên hệ</h2>
+<ul>
+  <li><strong>Địa chỉ:</strong> ........................................</li>
+  <li><strong>Điện thoại:</strong> ........................................</li>
+  <li><strong>Email:</strong> ........................................</li>
+  <li><strong>Website:</strong> ........................................</li>
+</ul>
 
-      <hr />
-      <p><em>Xin cảm ơn Quý khách đã quan tâm đến sản phẩm và dịch vụ của chúng tôi.</em></p>
-    `,
+<hr />
+<p><em>Xin cảm ơn Quý khách đã quan tâm đến sản phẩm và dịch vụ của chúng tôi.</em></p>
+`,
   },
   {
     id: 'meeting-notes',
     label: 'Ghi chú cuộc họp',
     imageUrl: '/meeting-notes.png',
     initialContent: `
-          <h1>Ghi chú cuộc họp</h1>
-          <p><strong>Ngày:</strong> …… | <strong>Địa điểm:</strong> ……</p>
+<h1>Ghi chú cuộc họp</h1>
+<p><strong>Ngày:</strong> …… | <strong>Địa điểm:</strong> ……</p>
 
-          <h2>Thông tin cuộc họp</h2>
-          <ul>
-            <li><strong>Chủ trì:</strong> …</li>
-            <li><strong>Thư ký:</strong> …</li>
-            <li><strong>Chủ đề:</strong> …</li>
-          </ul>
+<h2>Thông tin cuộc họp</h2>
+<ul>
+  <li><strong>Chủ trì:</strong> …</li>
+  <li><strong>Thư ký:</strong> …</li>
+  <li><strong>Chủ đề:</strong> …</li>
+</ul>
 
-          <h2>Người tham dự</h2>
-          <ul>
-            <li>…</li>
-            <li>…</li>
-          </ul>
+<h2>Người tham dự</h2>
+<ul>
+  <li>…</li>
+  <li>…</li>
+</ul>
 
-          <h2>Nội dung chính</h2>
-          <ol>
-            <li>Vấn đề 1</li>
-            <li>Vấn đề 2</li>
-          </ol>
+<h2>Nội dung chính</h2>
+<ol>
+  <li>Vấn đề 1</li>
+  <li>Vấn đề 2</li>
+</ol>
 
-          <h2>Quyết định</h2>
-          <ul>
-            <li>…</li>
-          </ul>
+<h2>Quyết định</h2>
+<ul>
+  <li>…</li>
+</ul>
 
-          <h2>Hành động tiếp theo</h2>
-          <table>
-            <tr>
-              <th>Nhiệm vụ</th>
-              <th>Người phụ trách</th>
-              <th>Thời hạn</th>
-            </tr>
-            <tr>
-              <td>…</td>
-              <td>…</td>
-              <td>…</td>
-            </tr>
-          </table>
+<h2>Hành động tiếp theo</h2>
+<table>
+  <tr>
+    <th>Nhiệm vụ</th>
+    <th>Người phụ trách</th>
+    <th>Thời hạn</th>
+  </tr>
+  <tr>
+    <td>…</td>
+    <td>…</td>
+    <td>…</td>
+  </tr>
+</table>
 `,
   },
 ]
